@@ -1,7 +1,7 @@
-import { app } from "./app.js";
-import { env } from "./config/env.js";
+import { app } from "./app";
+import { env } from "./config/env";
 
-const PORT = env.PORT || 3001;
+const PORT = env.PORT;
 
 const server = app.listen(PORT, () => {
   console.log(`🚀 Gleydsontattoo API running on port ${PORT}`);

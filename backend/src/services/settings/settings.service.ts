@@ -1,4 +1,4 @@
-import { SettingRepository } from '../../repositories/settings/setting.repository.js';
+import { SettingRepository } from '../../repositories/settings/setting.repository';
 
 const repo = new SettingRepository();
 

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { uuidSchema } from './common.schema.js';
+import { uuidSchema } from '../common/common.schema';
 
 export const createPortfolioSchema = z.object({
   title: z.string().min(2),

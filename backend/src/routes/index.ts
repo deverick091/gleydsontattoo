@@ -1,15 +1,15 @@
 import { Router } from 'express';
-import authRoutes from './auth.routes.js';
-import appointmentRoutes from './appointment.routes.js';
-import clientRoutes from './client.routes.js';
-import serviceRoutes from './service.routes.js';
-import portfolioRoutes from './portfolio.routes.js';
-import budgetRoutes from './budget.routes.js';
-import scheduleRoutes from './schedule.routes.js';
-import settingsRoutes from './settings.routes.js';
-import notificationRoutes from './notification.routes.js';
-import userRoutes from './user.routes.js';
-import auditRoutes from './audit.routes.js';
+import authRoutes from './auth.routes';
+import appointmentRoutes from './appointment.routes';
+import clientRoutes from './client.routes';
+import serviceRoutes from './service.routes';
+import portfolioRoutes from './portfolio.routes';
+import budgetRoutes from './budget.routes';
+import scheduleRoutes from './schedule.routes';
+import settingsRoutes from './settings.routes';
+import notificationRoutes from './notification.routes';
+import userRoutes from './user.routes';
+import auditRoutes from './audit.routes';
 
 const router = Router();
 

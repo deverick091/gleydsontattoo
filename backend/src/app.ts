@@ -4,10 +4,10 @@ import helmet from 'helmet';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
-import { env } from './config/env.js';
-import { corsConfig } from './config/cors.js';
-import routes from './routes/index.js';
-import { errorHandler } from './middleware/errorHandler.js';
+import { env } from './config/env';
+import { corsConfig } from './config/cors';
+import routes from './routes/index';
+import { errorHandler } from './middleware/errorHandler';
 
 const app = express();
 

@@ -1,21 +1,20 @@
 "use client";
 
 import { Check } from "lucide-react";
-import { SERVICE_CATEGORIES } from "@/lib/constants";
 import type { StepComponentProps } from "@/types";
 
-export default function StepService({ data, updateData, onNext }: StepComponentProps) {
-  const services = [
-    { id: '1', name: 'Tatuagem', description: 'Tatuagem personalizada', duration: 'A partir de 1h', price: 'A partir de R$ 200' },
-    { id: '2', name: 'Piercing', description: 'Perfuração asséptica', duration: '30 min', price: 'A partir de R$ 80' },
-  ];
+const SERVICES = [
+  { id: '1', name: 'Tatuagem', description: 'Tatuagem personalizada', duration: 'A partir de 1h', price: 'A partir de R$ 200' },
+  { id: '2', name: 'Piercing', description: 'Perfuração asséptica', duration: '30 min', price: 'A partir de R$ 80' },
+];
 
+export default function StepService({ data, updateData, onNext }: StepComponentProps) {
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-white mb-6">Qual serviço você deseja?</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {services.map((service) => {
+        {SERVICES.map((service) => {
           const isSelected = data.serviceId === service.id;
           return (
             <div

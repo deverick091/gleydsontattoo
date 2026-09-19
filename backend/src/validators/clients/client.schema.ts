@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { phoneSchema, emailSchema, paginationSchema } from './common.schema.js';
+import { phoneSchema, emailSchema, paginationSchema } from '../common/common.schema';
 
 export const createClientSchema = z.object({
   name: z.string().min(3, 'Nome muito curto'),

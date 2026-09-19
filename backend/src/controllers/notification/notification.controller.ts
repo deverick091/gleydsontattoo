@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { NotificationService } from '../../services/notification/notification.service.js';
-import { sendSuccess } from '../../helpers/response.js';
+import { NotificationService } from '../../services/notification/notification.service';
+import { sendSuccess } from '../../helpers/response';
 
 const service = new NotificationService();
 
@@ -9,6 +9,9 @@ export class NotificationController {
     try {
       const result = await service.getPending();
       return sendSuccess(res, result);
-    } catch (e: any) { res.status(400).json({ success: false, error: { message: e.message } }); }
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Erro ao obter notificações';
+      res.status(400).json({ success: false, error: { message } });
+    }
   }
 }

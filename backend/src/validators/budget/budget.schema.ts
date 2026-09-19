@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { phoneSchema, emailSchema, uuidSchema } from './common.schema.js';
+import { phoneSchema, emailSchema, uuidSchema } from '../common/common.schema';
 
 export const createBudgetSchema = z.object({
   name: z.string().min(3),

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { ScheduleController } from '../controllers/schedule/schedule.controller.js';
+import { ScheduleController } from '../controllers/schedule/schedule.controller';
 
 const router = Router();
 const controller = new ScheduleController();

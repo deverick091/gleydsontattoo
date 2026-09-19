@@ -4,11 +4,9 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import type { StepComponentProps } from "@/types";
 
-export default function StepTime({ data, updateData, onNext }: StepComponentProps) {
-  const slots = [
-    "09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00", "17:00"
-  ];
+const TIME_SLOTS = ["09:00", "10:00", "11:00", "13:00", "14:00", "15:00", "16:00", "17:00"];
 
+export default function StepTime({ data, updateData, onNext }: StepComponentProps) {
   const dateFormatted = data.selectedDate
     ? format(new Date(data.selectedDate), "dd 'de' MMMM", { locale: ptBR })
     : "Data não selecionada";
@@ -21,12 +19,12 @@ export default function StepTime({ data, updateData, onNext }: StepComponentProp
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-        {slots.map((time, index) => {
+        {TIME_SLOTS.map((time) => {
           const isSelected = data.selectedTime === time;
 
           return (
             <button
-              key={index}
+              key={time}
               onClick={() => {
                 updateData({ selectedTime: time });
                 setTimeout(onNext, 300);

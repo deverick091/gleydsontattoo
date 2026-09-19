@@ -4,18 +4,6 @@
   "outputDirectory": ".next",
   "framework": "nextjs",
   "installCommand": "npm ci",
-  "env": {
-    "NEXT_PUBLIC_API_URL": {
-      "description": "URL da API backend",
-      "required": false
-    }
-  },
-  "rewrites": [
-    {
-      "source": "/api/:path*",
-      "destination": "${NEXT_PUBLIC_API_URL}/api/:path*"
-    }
-  ],
   "headers": [
     {
       "source": "/(.*)",

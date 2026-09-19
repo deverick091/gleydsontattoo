@@ -1,4 +1,4 @@
-import { NotificationRepository } from '../../repositories/notification/notification.repository.js';
+import { NotificationRepository } from '../../repositories/notification/notification.repository';
 
 const repo = new NotificationRepository();
 

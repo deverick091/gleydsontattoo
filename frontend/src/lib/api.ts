@@ -1,4 +1,6 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+import env from './env';
+
+const API_URL = env.NEXT_PUBLIC_API_URL;
 
 class ApiClient {
   private baseUrl: string;
@@ -21,14 +23,40 @@ class ApiClient {
       ...options.headers,
     };
 
-    const res = await fetch(url, { ...options, headers, credentials: 'include' });
-    const data = await res.json();
+    try {
+      const res = await fetch(url, {
+        ...options,
+        headers,
+        credentials: 'include',
+        signal: AbortSignal.timeout(30000),
+      });
 
-    if (!res.ok) {
-      throw new ApiError(data.error?.message || 'Erro na requisição', res.status, data.error?.code);
+      let data;
+      try {
+        data = await res.json();
+      } catch {
+        throw new ApiError('Resposta inválida do servidor', res.status, 'INVALID_RESPONSE');
+      }
+
+      if (!res.ok) {
+        throw new ApiError(
+          data.error?.message || 'Erro na requisição',
+          res.status,
+          data.error?.code
+        );
+      }
+
+      return data;
+    } catch (error) {
+      if (error instanceof ApiError) throw error;
+      if (error instanceof TypeError) {
+        throw new ApiError('Erro de conexão com o servidor', 0, 'NETWORK_ERROR');
+      }
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        throw new ApiError('Requisição expirou', 0, 'TIMEOUT');
+      }
+      throw new ApiError('Erro desconhecido', 0, 'UNKNOWN_ERROR');
     }
-
-    return data;
   }
 
   async get<T>(endpoint: string, params?: Record<string, string>): Promise<T> {
@@ -54,21 +82,53 @@ class ApiClient {
 
   async upload<T>(endpoint: string, formData: FormData): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: this.getAuthHeaders(),
-      body: formData,
-      credentials: 'include',
-    });
-    const data = await res.json();
-    if (!res.ok) throw new ApiError(data.error?.message || 'Erro no upload', res.status, data.error?.code);
-    return data;
+
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: this.getAuthHeaders(),
+        body: formData,
+        credentials: 'include',
+        signal: AbortSignal.timeout(60000),
+      });
+
+      let data;
+      try {
+        data = await res.json();
+      } catch {
+        throw new ApiError('Resposta inválida do servidor', res.status, 'INVALID_RESPONSE');
+      }
+
+      if (!res.ok) {
+        throw new ApiError(
+          data.error?.message || 'Erro no upload',
+          res.status,
+          data.error?.code
+        );
+      }
+
+      return data;
+    } catch (error) {
+      if (error instanceof ApiError) throw error;
+      if (error instanceof TypeError) {
+        throw new ApiError('Erro de conexão com o servidor', 0, 'NETWORK_ERROR');
+      }
+      if (error instanceof DOMException && error.name === 'AbortError') {
+        throw new ApiError('Upload expirou', 0, 'TIMEOUT');
+      }
+      throw new ApiError('Erro desconhecido', 0, 'UNKNOWN_ERROR');
+    }
   }
 }
 
 export class ApiError extends Error {
-  constructor(message: string, public status: number, public code?: string) {
+  constructor(
+    message: string,
+    public status: number,
+    public code?: string
+  ) {
     super(message);
+    this.name = 'ApiError';
   }
 }
 

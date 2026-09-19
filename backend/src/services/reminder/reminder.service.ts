@@ -1,6 +1,6 @@
 import cron from 'node-cron';
-import { AppointmentRepository } from '../../repositories/appointments/appointment.repository.js';
-import { WhatsAppService } from '../whatsapp/whatsapp.service.js';
+import { AppointmentRepository } from '../../repositories/appointments/appointment.repository';
+import { WhatsAppService } from '../whatsapp/whatsapp.service';
 
 const repo = new AppointmentRepository();
 const waService = new WhatsAppService();

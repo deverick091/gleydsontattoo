@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { AppError } from '@/helpers/errors';
+import { AppError } from '../helpers/errors.js';
 
 type AsyncHandler = (req: Request, res: Response, next: NextFunction) => Promise<void>;
 

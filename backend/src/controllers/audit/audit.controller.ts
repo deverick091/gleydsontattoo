@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { AuditService } from '../../services/audit/audit.service.js';
-import { sendSuccess } from '../../helpers/response.js';
+import { AuditService } from '../../services/audit/audit.service';
+import { sendSuccess } from '../../helpers/response';
 
 const service = new AuditService();
 
@@ -9,8 +9,11 @@ export class AuditController {
     try {
       const page = Number(req.query.page) || 1;
       const limit = Number(req.query.limit) || 20;
-      const result = await service.getAll(req.query, page, limit);
+      const result = await service.getAll(req.query as Record<string, any>, page, limit);
       return sendSuccess(res, result);
-    } catch (e: any) { res.status(400).json({ success: false, error: { message: e.message } }); }
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'Erro ao obter logs de auditoria';
+      res.status(400).json({ success: false, error: { message } });
+    }
   }
 }

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, ChevronLeft } from "lucide-react";
+import { BookingData } from "@/types";
 
 import StepService from "./step-service";
 import StepProfessional from "./step-professional";
@@ -23,10 +24,23 @@ const steps = [
   "Confirmação"
 ];
 
+const initialBookingData: BookingData = {
+  serviceId: "",
+  serviceName: "",
+  professionalId: "",
+  professionalName: "",
+  selectedDate: "",
+  selectedTime: "",
+  clientName: "",
+  clientPhone: "",
+  clientEmail: "",
+  notes: ""
+};
+
 export default function BookingStepper() {
   const [currentStep, setCurrentStep] = useState(0);
-  const [bookingData, setBookingData] = useState<any>({});
-  
+  const [bookingData, setBookingData] = useState<BookingData>(initialBookingData);
+
   const handleNext = () => {
     if (currentStep < steps.length - 1) setCurrentStep(prev => prev + 1);
   };
@@ -35,13 +49,18 @@ export default function BookingStepper() {
     if (currentStep > 0) setCurrentStep(prev => prev - 1);
   };
 
-  const updateData = (data: any) => {
-    setBookingData((prev: any) => ({ ...prev, ...data }));
+  const updateData = (data: Partial<BookingData>) => {
+    setBookingData((prev) => ({ ...prev, ...data }));
   };
 
-  const handleConfirm = () => {
-    // API Call goes here
-    handleNext();
+  const handleConfirm = async () => {
+    try {
+      // TODO: Implement API call to create appointment
+      console.log("Booking data:", bookingData);
+      handleNext();
+    } catch (error) {
+      console.error("Erro ao confirmar agendamento:", error);
+    }
   };
 
   return (
@@ -53,7 +72,7 @@ export default function BookingStepper() {
             <span className="text-accent font-medium">{steps[currentStep]}</span>
           </div>
           <div className="w-full bg-zinc-800 h-2 rounded-full overflow-hidden">
-            <motion.div 
+            <motion.div
               className="bg-accent h-full"
               initial={{ width: 0 }}
               animate={{ width: `${((currentStep) / (steps.length - 2)) * 100}%` }}
@@ -86,15 +105,15 @@ export default function BookingStepper() {
 
       {currentStep < steps.length - 2 && (
         <div className="border-t border-border p-6 bg-black flex justify-between items-center">
-          <Button 
-            variant="outline" 
-            onClick={handleBack} 
+          <Button
+            variant="outline"
+            onClick={handleBack}
             disabled={currentStep === 0}
             className="flex items-center"
           >
             <ChevronLeft className="w-4 h-4 mr-2" /> Voltar
           </Button>
-          <Button 
+          <Button
             onClick={handleNext}
             className="flex items-center"
           >

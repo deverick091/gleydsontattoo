@@ -1,7 +1,7 @@
 import multer from 'multer';
 import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
-import { ValidationError } from '../helpers/errors.js';
+import { ValidationError } from '../helpers/errors';
 import { Request } from 'express';
 
 const storage = multer.diskStorage({

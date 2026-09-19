@@ -1,6 +1,6 @@
 import { Response, NextFunction } from 'express';
-import { AuthRequest } from './auth.js';
-import prisma from '../config/database.js';
+import { AuthRequest } from './auth';
+import prisma from '../config/database';
 
 export const audit = (action: string, resource: string) => {
   return async (req: AuthRequest, res: Response, next: NextFunction) => {

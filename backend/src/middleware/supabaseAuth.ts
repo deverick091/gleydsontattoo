@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { supabase } from '../config/supabase.js';
-import { UnauthorizedError } from '../helpers/errors.js';
+import { supabase } from '../config/supabase';
+import { UnauthorizedError } from '../helpers/errors';
 
 export interface AuthenticatedRequest extends Request {
   user?: {

@@ -1,7 +1,7 @@
 import { z } from 'zod';
-import { uuidSchema } from './common.schema.js';
+import { uuidSchema } from '../common/common.schema.js';
 
-export const createBlockSchema = z.object({
+const blockBase = z.object({
   professionalId: uuidSchema,
   startDate: z.coerce.date(),
   endDate: z.coerce.date(),
@@ -10,6 +10,11 @@ export const createBlockSchema = z.object({
   allDay: z.boolean().default(true),
   reason: z.enum(['VACATION', 'HOLIDAY', 'MAINTENANCE', 'PERSONAL', 'OTHER']),
   description: z.string().optional()
-}).refine(data => data.endDate >= data.startDate, { message: 'Data final deve ser posterior à inicial' });
+});
 
-export const updateBlockSchema = createBlockSchema.partial();
+export const createBlockSchema = blockBase.refine(data => data.endDate >= data.startDate, { message: 'Data final deve ser posterior à inicial' });
+
+export const updateBlockSchema = blockBase.partial().refine(data => {
+  if (data.endDate && data.startDate) return data.endDate >= data.startDate;
+  return true;
+}, { message: 'Data final deve ser posterior à inicial' });

@@ -1,4 +1,5 @@
-import { UserRepository } from '../../repositories/users/user.repository.js';
+import { UserRepository } from '../../repositories/users/user.repository';
+import { Prisma } from '@prisma/client';
 
 const repo = new UserRepository();
 
@@ -15,11 +16,11 @@ export class UserService {
     return repo.findByEmail(email);
   }
 
-  async create(data: any) {
+  async create(data: Prisma.UserCreateInput) {
     return repo.create(data);
   }
 
-  async update(id: string, data: any) {
+  async update(id: string, data: Prisma.UserUpdateInput) {
     return repo.update(id, data);
   }
 

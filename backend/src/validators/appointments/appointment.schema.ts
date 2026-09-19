@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { uuidSchema, phoneSchema, emailSchema } from './common.schema.js';
+import { uuidSchema, phoneSchema, emailSchema } from '../common/common.schema';
 
 export const createAppointmentSchema = z.object({
   professionalId: uuidSchema,

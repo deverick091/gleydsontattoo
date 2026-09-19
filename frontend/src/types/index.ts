@@ -168,13 +168,13 @@ export interface AuditLog {
   action: string;
   entityType: string;
   entityId: string;
-  details: any;
+  details: Record<string, unknown>;
   createdAt: Date;
 }
 
 export interface Setting {
   key: string;
-  value: any;
+  value: string | number | boolean | Record<string, unknown>;
   updatedAt: Date;
 }
 

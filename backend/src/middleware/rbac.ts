@@ -1,6 +1,6 @@
 import { Response, NextFunction } from 'express';
-import { AuthRequest } from './auth.js';
-import { ForbiddenError, UnauthorizedError } from '../helpers/errors.js';
+import { AuthRequest } from './auth';
+import { ForbiddenError, UnauthorizedError } from '../helpers/errors';
 
 export const authorize = (...roles: string[]) => {
   return (req: AuthRequest, res: Response, next: NextFunction) => {

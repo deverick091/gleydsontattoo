@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { emailSchema, phoneSchema } from './common.schema.js';
+import { emailSchema, phoneSchema } from '../common/common.schema';
 
 export const loginSchema = z.object({
   email: emailSchema,
