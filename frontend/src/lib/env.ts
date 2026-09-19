@@ -1,7 +1,11 @@
 import { z } from 'zod';
 
 const envSchema = z.object({
-  NEXT_PUBLIC_API_URL: z.string().url().optional().or(z.literal('')),
+  NEXT_PUBLIC_API_URL: z.union([
+    z.string().url(),
+    z.literal(''),
+    z.undefined(),
+  ]).optional(),
 });
 
 type Env = z.infer<typeof envSchema>;
