@@ -9,7 +9,8 @@
     "start": "node dist/server.js",
     "test": "vitest run",
     "seed": "tsx prisma/seed.ts",
-    "migrate": "prisma migrate dev"
+    "migrate": "prisma migrate dev",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@prisma/client": "^5.0.0",
