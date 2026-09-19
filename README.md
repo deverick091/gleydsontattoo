@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 🎨 Gleydsontattoo — Sistema Digital para Estúdio de Tatuagem
 
 <div align="center">
@@ -209,3 +210,6 @@ R. Domingos Silva, 84 — Barcarena, PA — 68445-000
 
 </div>
 
+=======
+# gleydsontattoo
+>>>>>>> b20b4161e2267a13b8c0390235f5a439e766cce9

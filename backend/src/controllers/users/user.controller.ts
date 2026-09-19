@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { UserService } from '../services/users/user.service.js';
-import { sendSuccess, sendCreated } from '../helpers/response.js';
+import { UserService } from '../../services/users/user.service.js';
+import { sendSuccess, sendCreated } from '../../helpers/response.js';
 
 const service = new UserService();
 

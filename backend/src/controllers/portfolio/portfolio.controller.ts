@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { PortfolioService } from '../services/portfolio/portfolio.service.js';
-import { sendSuccess } from '../helpers/response.js';
+import { PortfolioService } from '../../services/portfolio/portfolio.service.js';
+import { sendSuccess } from '../../helpers/response.js';
 
 const service = new PortfolioService();
 

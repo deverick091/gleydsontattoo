@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { ScheduleService } from '../services/schedule/schedule.service.js';
-import { sendSuccess } from '../helpers/response.js';
+import { ScheduleService } from '../../services/schedule/schedule.service.js';
+import { sendSuccess } from '../../helpers/response.js';
 
 const service = new ScheduleService();
 

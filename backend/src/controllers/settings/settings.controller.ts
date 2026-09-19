@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { SettingsService } from '../services/settings/settings.service.js';
-import { sendSuccess } from '../helpers/response.js';
+import { SettingsService } from '../../services/settings/settings.service.js';
+import { sendSuccess } from '../../helpers/response.js';
 
 const service = new SettingsService();
 

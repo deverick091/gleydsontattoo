@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { BudgetService } from '../services/budget/budget.service.js';
-import { sendSuccess, sendCreated } from '../helpers/response.js';
+import { BudgetService } from '../../services/budget/budget.service.js';
+import { sendSuccess, sendCreated } from '../../helpers/response.js';
 
 const service = new BudgetService();
 

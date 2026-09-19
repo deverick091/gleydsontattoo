@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { AuditService } from '../services/audit/audit.service.js';
-import { sendSuccess } from '../helpers/response.js';
+import { AuditService } from '../../services/audit/audit.service.js';
+import { sendSuccess } from '../../helpers/response.js';
 
 const service = new AuditService();
 
