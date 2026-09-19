@@ -1,17 +1,14 @@
 {
   "version": 2,
-  "buildCommand": "cd frontend && npm run build",
-  "outputDirectory": "frontend/.next",
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next",
   "framework": "nextjs",
+  "nodeVersion": "20.x",
+  "installCommand": "npm ci",
   "env": {
     "NEXT_PUBLIC_API_URL": {
       "description": "URL da API backend",
       "required": true
-    }
-  },
-  "functions": {
-    "frontend/pages/api/**": {
-      "runtime": "nodejs20.x"
     }
   },
   "rewrites": [
