@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "rewrites": [
-    { "source": "/(.*)", "destination": "src/server.js" }
-  ]
+  "installCommand": "npm ci --include=dev",
+  "buildCommand": "npm run build"
 }
