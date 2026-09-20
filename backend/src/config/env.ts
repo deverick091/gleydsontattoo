@@ -9,12 +9,11 @@ const envSchema = z.object({
   DATABASE_URL: z.string().url(),
   NEXT_PUBLIC_SUPABASE_URL: z.string().url(),
   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: z.string(),
-  SUPABASE_SERVICE_ROLE_KEY: z.string(),
+  SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
   JWT_SECRET: z.string().min(32),
   JWT_EXPIRES_IN: z.string().default('7d'),
-  CORS_ORIGIN: z.string().default('*'),
+  CORS_ORIGIN: z.string().url().default('http://localhost:3000'),
   ADMIN_EMAIL: z.string().email(),
-  ADMIN_PASSWORD: z.string().min(8),
 });
 
 const parsedEnv = envSchema.safeParse(process.env);
