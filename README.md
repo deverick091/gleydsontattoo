@@ -1,215 +1,84 @@
-<<<<<<< HEAD
-# 🎨 Gleydsontattoo — Sistema Digital para Estúdio de Tatuagem
+# Gleydsontattoo
 
-<div align="center">
+Sistema full-stack para gestão de estúdio de tatuagem, com site institucional, portfólio, agendamento online e painel administrativo.
 
-**GLEYDSON**TATTOO
+## Tecnologias
 
-*Marcando histórias na pele*
+- **Frontend:** Next.js, React, TypeScript e Tailwind CSS
+- **Backend:** Node.js, Express, TypeScript e Prisma
+- **Base de dados e autenticação:** Supabase/PostgreSQL
+- **Deploy:** Vercel
 
-Sistema web completo, moderno e profissional para o Estúdio Gleydsontattoo — Barcarena, PA.
+## Estrutura
 
-[Site](http://localhost:3000) · [API](http://localhost:3001) · [Documentação](./docs/)
-
-</div>
-
----
-
-## 📋 Sobre o Projeto
-
-Sistema digital full-stack que integra **site institucional**, **portfólio**, **agendamento online**, **CRM**, **painel administrativo**, **WhatsApp** e **notificações** — tudo com arquitetura MVC, segurança robusta e experiência visual premium.
-
-### Funcionalidades Principais
-
-- 🌐 **Site Institucional** — Home, portfólio, serviços, contato, SEO completo
-- 📅 **Agendamento Online** — Fluxo intuitivo em 7 etapas com proteção contra conflitos
-- 👤 **CRM de Clientes** — Histórico, dados, notas, último/próximo atendimento
-- 📸 **Portfólio Premium** — Galeria filtrada, modal, zoom, otimização de imagens
-- 💰 **Orçamentos** — Formulário de orçamento com conversão em agendamento
-- 📱 **WhatsApp** — Confirmação, lembretes, cancelamento, pós-atendimento
-- 🔧 **Painel Admin** — Dashboard, calendário, gráficos, configurações, usuários
-- 🔐 **Segurança** — JWT, RBAC, rate limiting, LGPD, audit logs
-- 🎨 **Design Premium** — Dark luxury, animações cinematográficas, responsivo
-
----
-
-## 🛠 Tecnologias
-
-| Camada | Tecnologia |
-|--------|-----------|
-| Frontend | Next.js 14, React 18, TypeScript, Tailwind CSS, Framer Motion |
-| Backend | Node.js, Express.js, TypeScript, Arquitetura MVC |
-| Banco | PostgreSQL 16, Prisma ORM |
-| Validação | Zod |
-| Autenticação | JWT + bcrypt |
-| Upload | Multer + Sharp (WebP) |
-| WhatsApp | Evolution API (abstrato) |
-| Testes | Vitest + Supertest |
-| Container | Docker + Docker Compose |
-| CI/CD | GitHub Actions |
-
----
-
-## 📁 Estrutura do Projeto
-
-```
-gleydsontattoo/
-├── frontend/           # Next.js 14 (App Router)
-│   ├── src/
-│   │   ├── app/        # Páginas e rotas
-│   │   ├── components/ # Componentes React
-│   │   ├── hooks/      # Custom hooks
-│   │   ├── lib/        # Utilitários
-│   │   ├── services/   # API client
-│   │   └── types/      # TypeScript types
-│   └── public/         # Assets estáticos
-│
-├── backend/            # Express.js (MVC)
-│   ├── src/
-│   │   ├── controllers/
-│   │   ├── services/
-│   │   ├── repositories/
-│   │   ├── middleware/
-│   │   ├── validators/
-│   │   ├── routes/
-│   │   ├── config/
-│   │   ├── helpers/
-│   │   └── types/
-│   └── prisma/         # Schema + Migrations + Seeds
-│
-├── tests/              # Testes automatizados
-├── docs/               # Documentação técnica
-├── .github/workflows/  # CI/CD
-└── docker-compose.yml
+```text
+.
+├── frontend/          # Aplicação Next.js
+├── backend/           # API Express e schema Prisma
+│   ├── api/           # Entrada serverless da Vercel
+│   ├── prisma/
+│   └── src/
+├── docs/              # Documentação técnica e arquivo histórico
+└── .github/workflows/ # Integração contínua
 ```
 
----
+## Desenvolvimento local
 
-## 🚀 Começando
-
-### Pré-requisitos
-
-- [Node.js](https://nodejs.org/) 20+
-- [PostgreSQL](https://www.postgresql.org/) 16+ (ou Docker)
-
-### Instalação
+### Backend
 
 ```bash
-# 1. Clone o repositório
-git clone https://github.com/your-user/gleydsontattoo.git
-cd gleydsontattoo
-
-# 2. Configure as variáveis de ambiente
+cd backend
 cp .env.example .env
-# Edite .env com seus valores
-
-# 3. Instale e configure o Backend
-cd backend
-npm install
-npx prisma migrate dev
-npx prisma db seed
+npm ci
+npx prisma generate
 npm run dev
+```
 
-# 4. Instale e inicie o Frontend (novo terminal)
+### Frontend
+
+```bash
 cd frontend
-npm install
+cp .env.example .env.local
+npm ci
 npm run dev
 ```
 
-### Com Docker
+O frontend estará disponível em `http://localhost:3000` e a API em `http://localhost:3001`.
 
-```bash
-docker compose up -d
-```
+## Variáveis de ambiente
 
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:3001
-- PostgreSQL: localhost:5432
+Configure os ficheiros locais, que não devem ser enviados ao Git:
 
----
+- `backend/.env`
+- `frontend/.env.local`
 
-## ⚙️ Variáveis de Ambiente
+Consulte [backend/.env.example](backend/.env.example) e [frontend/.env.example](frontend/.env.example). Em produção, configure essas variáveis diretamente nos respetivos projetos da Vercel.
 
-Consulte o arquivo [`.env.example`](./.env.example) para a lista completa. Principais:
+Nunca exponha `DATABASE_URL`, `JWT_SECRET`, `ADMIN_PASSWORD` ou `SUPABASE_SERVICE_ROLE_KEY` no frontend ou no repositório.
 
-| Variável | Descrição |
-|----------|-----------|
-| `DATABASE_URL` | URL de conexão PostgreSQL |
-| `JWT_SECRET` | Segredo para tokens de acesso |
-| `JWT_REFRESH_SECRET` | Segredo para refresh tokens |
-| `ADMIN_EMAIL` | E-mail do admin inicial |
-| `ADMIN_PASSWORD` | Senha do admin inicial |
-| `WHATSAPP_ENABLED` | Ativar integração WhatsApp |
-| `CORS_ORIGIN` | URL do frontend |
+## Deploy na Vercel
 
----
+Crie dois projetos Vercel a partir deste repositório:
 
-## 🧪 Testes
+| Projeto | Root Directory | Framework Preset |
+| --- | --- | --- |
+| Frontend | `frontend` | Next.js |
+| Backend | `backend` | Other |
 
-```bash
-cd backend
-npm test                    # Todos os testes
-npm run test:concurrency    # Teste de concorrência de agendamentos
-```
+O backend é publicado como uma função serverless por [backend/api/index.ts](backend/api/index.ts). No frontend, defina `NEXT_PUBLIC_API_URL` com o domínio do projeto backend.
 
-### Testes incluídos:
-- ✅ Autenticação (login, JWT, permissões)
-- ✅ Agendamento (criação, conflitos, status)
-- ✅ **Concorrência** (dois clientes no mesmo horário)
-- ✅ Validações (Zod schemas)
-- ✅ API (endpoints, responses)
+## Documentação
 
----
+- [API](docs/api.md)
+- [Arquitetura](docs/architecture.md)
+- [Base de dados](docs/database.md)
+- [Deploy](docs/deployment.md)
+- [Segurança](docs/security.md)
+- [Supabase](docs/supabase-setup.md)
+- [WhatsApp](docs/whatsapp.md)
 
-## 📱 Fluxo de Agendamento
+Documentação histórica e scripts descontinuados estão em [docs/archive](docs/archive/).
 
-```
-Selecionar Serviço → Profissional → Data → Horário → Dados → Resumo → Confirmação → WhatsApp
-```
+## Licença
 
----
-
-## 🔐 Segurança
-
-- JWT com refresh tokens (HttpOnly cookies)
-- RBAC (Admin, Atendente)
-- Rate limiting por IP
-- Helmet (security headers)
-- Zod validation (input sanitization)
-- Prisma (SQL injection prevention)
-- MIME type validation (uploads)
-- Audit logging
-- LGPD compliance
-
----
-
-## 📖 Documentação
-
-| Documento | Descrição |
-|-----------|-----------|
-| [Arquitetura](./docs/architecture.md) | Padrões, fluxos, decisões |
-| [Banco de Dados](./docs/database.md) | Schema, ER diagram, backup |
-| [Segurança](./docs/security.md) | Autenticação, RBAC, LGPD |
-| [API](./docs/api.md) | Endpoints, formatos, exemplos |
-| [Deploy](./docs/deployment.md) | Ambientes, Docker, CI/CD |
-| [WhatsApp](./docs/whatsapp.md) | Integração, templates, setup |
-
----
-
-## 📄 Licença
-
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](./LICENSE) para detalhes.
-
----
-
-<div align="center">
-
-**Gleydsontattoo** — *Marcando histórias na pele* 🎨
-
-R. Domingos Silva, 84 — Barcarena, PA — 68445-000
-
-</div>
-
-=======
-# gleydsontattoo
->>>>>>> b20b4161e2267a13b8c0390235f5a439e766cce9
+Este projeto está sob a licença MIT. Consulte [LICENSE](LICENSE).
