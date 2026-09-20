@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C .. ls-files backend/package-lock.json backend/package.json backend/vercel.json backend/tsconfig.json backend/api/index.ts)"
+    ]
+  }
+}
