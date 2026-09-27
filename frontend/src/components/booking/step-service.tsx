@@ -1,48 +1,123 @@
 "use client";
 
-import { Check } from "lucide-react";
-import type { StepComponentProps } from "@/types";
+import { useEffect, useState } from "react";
+import { Check, RefreshCw } from "lucide-react";
+import EmptyState from "@/components/shared/empty-state";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ApiError } from "@/lib/api";
+import { bookingService } from "@/services/booking.service";
+import type { BookingService, StepComponentProps } from "@/types";
 
-const SERVICES = [
-  { id: '1', name: 'Tatuagem', description: 'Tatuagem personalizada', duration: 'A partir de 1h', price: 'A partir de R$ 200' },
-  { id: '2', name: 'Piercing', description: 'Perfuração asséptica', duration: '30 min', price: 'A partir de R$ 80' },
-];
+function formatDuration(duration: number) {
+  const hours = Math.floor(duration / 60);
+  const minutes = duration % 60;
+
+  if (hours && minutes) return `${hours}h ${minutes} min`;
+  if (hours) return `${hours}h`;
+  return `${minutes} min`;
+}
+
+function formatPrice(service: BookingService) {
+  if (service.priceType === "CONSULTATION") return "Sob consulta";
+
+  const price = service.priceMin ?? service.priceMax;
+  if (price === null || price === undefined) return "Sob consulta";
+
+  const formatted = new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+    maximumFractionDigits: 0,
+  }).format(Number(price));
+
+  return service.priceType === "STARTING_AT" ? `A partir de ${formatted}` : formatted;
+}
 
 export default function StepService({ data, updateData, onNext }: StepComponentProps) {
+  const [services, setServices] = useState<BookingService[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadServices = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      setServices(await bookingService.getServices());
+    } catch (error) {
+      setError(error instanceof ApiError ? error.message : "Não foi possível carregar os serviços.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    void loadServices();
+  }, []);
+
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-white mb-6">Qual serviço você deseja?</h2>
+      <h2 className="mb-6 text-2xl font-bold text-white">Qual serviço você deseja?</h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {SERVICES.map((service) => {
-          const isSelected = data.serviceId === service.id;
-          return (
-            <div
-              key={service.id}
-              onClick={() => {
-                updateData({ serviceId: service.id, serviceName: service.name });
-                setTimeout(onNext, 300);
-              }}
-              className={`relative p-6 rounded-xl border-2 cursor-pointer transition-all ${
-                isSelected ? 'border-accent bg-accent/5' : 'border-zinc-800 bg-zinc-950 hover:border-zinc-700'
-              }`}
-            >
-              <h3 className="text-xl font-bold text-white mb-2">{service.name}</h3>
-              <p className="text-muted text-sm mb-4">{service.description}</p>
-              <div className="flex justify-between items-center text-sm">
-                <span className="text-zinc-400">{service.duration}</span>
-                <span className="text-accent font-semibold">{service.price}</span>
-              </div>
+      {isLoading && (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          {Array.from({ length: 4 }, (_, index) => (
+            <Skeleton key={index} className="h-48 rounded-xl" />
+          ))}
+        </div>
+      )}
 
-              {isSelected && (
-                <div className="absolute top-4 right-4 bg-accent text-black rounded-full p-1">
-                  <Check className="w-4 h-4" />
+      {!isLoading && error && (
+        <EmptyState
+          icon={<RefreshCw className="h-8 w-8" />}
+          title="Não foi possível carregar os serviços"
+          description={error}
+          actionLabel="Tentar novamente"
+          onAction={() => void loadServices()}
+        />
+      )}
+
+      {!isLoading && !error && services.length === 0 && (
+        <EmptyState
+          title="Nenhum serviço disponível"
+          description="Não há serviços disponíveis para agendamento neste momento."
+        />
+      )}
+
+      {!isLoading && !error && services.length > 0 && (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          {services.map((service) => {
+            const isSelected = data.serviceId === service.id;
+
+            return (
+              <button
+                key={service.id}
+                type="button"
+                onClick={() => {
+                  updateData({ serviceId: service.id, serviceName: service.name });
+                  window.setTimeout(onNext, 300);
+                }}
+                className={`relative rounded-xl border-2 p-6 text-left transition-all ${
+                  isSelected
+                    ? "border-accent bg-accent/5"
+                    : "border-zinc-800 bg-zinc-950 hover:border-zinc-700"
+                }`}
+              >
+                <h3 className="mb-2 text-xl font-bold text-white">{service.name}</h3>
+                <p className="mb-4 text-sm text-muted">{service.description ?? "Serviço personalizado"}</p>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-zinc-400">{formatDuration(service.duration)}</span>
+                  <span className="font-semibold text-accent">{formatPrice(service)}</span>
                 </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
+
+                {isSelected && (
+                  <span className="absolute right-4 top-4 rounded-full bg-accent p-1 text-black">
+                    <Check className="h-4 w-4" />
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

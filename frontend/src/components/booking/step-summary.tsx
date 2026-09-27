@@ -17,6 +17,7 @@ interface StepSummaryProps {
   data: BookingData;
   onEdit: (step: number) => void;
   onConfirm: () => void;
+  isSubmitting?: boolean;
 }
 
 const Section = ({ title, content, step, onEdit }: SectionProps) => (
@@ -34,7 +35,7 @@ const Section = ({ title, content, step, onEdit }: SectionProps) => (
   </div>
 );
 
-export default function StepSummary({ data, onEdit, onConfirm }: StepSummaryProps) {
+export default function StepSummary({ data, onEdit, onConfirm, isSubmitting = false }: StepSummaryProps) {
   const dateFormatted = data.selectedDate
     ? format(new Date(data.selectedDate), "EEEE, dd 'de' MMMM 'de' yyyy", { locale: ptBR })
     : "";
@@ -76,8 +77,8 @@ export default function StepSummary({ data, onEdit, onConfirm }: StepSummaryProp
         </label>
       </div>
 
-      <Button size="lg" className="w-full h-14 text-lg" onClick={onConfirm}>
-        Confirmar Agendamento
+      <Button size="lg" className="w-full h-14 text-lg" onClick={onConfirm} disabled={isSubmitting}>
+        {isSubmitting ? "Confirmando..." : "Confirmar Agendamento"}
       </Button>
     </div>
   );

@@ -10,10 +10,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const router = useRouter();
 
   useEffect(() => {
-    // In a real app we redirect if not logged in.
-    // For now we assume we are just rendering the layout
-    // if (!isLoading && !user) router.push('/auth/login');
+    if (!isLoading && !user) router.replace('/auth/login');
   }, [user, isLoading, router]);
+
+  if (isLoading || !user) return null;
 
   return (
     <AdminLayoutComponent>

@@ -2,13 +2,29 @@ import prisma from '../../config/database';
 import { AppointmentStatus, Prisma } from '@prisma/client';
 
 export class AppointmentRepository {
-  async findAll(filters: { status?: AppointmentStatus; date?: Date; professionalId?: string }, skip: number, take: number) {
+  async findAll(filters: { status?: AppointmentStatus; date?: Date; dateFrom?: Date; dateTo?: Date; professionalId?: string; query?: string }, skip: number, take: number) {
+    const { date, dateFrom, dateTo, query, ...rest } = filters;
+    const where: Prisma.AppointmentWhereInput = {
+      ...rest,
+      ...(date ? { date } : dateFrom || dateTo ? { date: { ...(dateFrom ? { gte: dateFrom } : {}), ...(dateTo ? { lte: dateTo } : {}) } } : {}),
+      ...(query ? { client: { OR: [{ name: { contains: query, mode: 'insensitive' } }, { phone: { contains: query } }, { email: { contains: query, mode: 'insensitive' } }] } } : {})
+    };
     return prisma.appointment.findMany({
-      where: filters,
+      where,
       skip, take,
       include: { client: true, service: true, professional: true },
-      orderBy: { date: 'asc' }
+      orderBy: [{ date: 'asc' }, { startTime: 'asc' }]
     });
+  }
+
+  async count(filters: { status?: AppointmentStatus; date?: Date; dateFrom?: Date; dateTo?: Date; professionalId?: string; query?: string }) {
+    const { date, dateFrom, dateTo, query, ...rest } = filters;
+    const where: Prisma.AppointmentWhereInput = {
+      ...rest,
+      ...(date ? { date } : dateFrom || dateTo ? { date: { ...(dateFrom ? { gte: dateFrom } : {}), ...(dateTo ? { lte: dateTo } : {}) } } : {}),
+      ...(query ? { client: { OR: [{ name: { contains: query, mode: 'insensitive' } }, { phone: { contains: query } }, { email: { contains: query, mode: 'insensitive' } }] } } : {})
+    };
+    return prisma.appointment.count({ where });
   }
 
   async findById(id: string) {

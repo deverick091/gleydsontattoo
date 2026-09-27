@@ -4,6 +4,9 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, ChevronLeft } from "lucide-react";
+import toast from "react-hot-toast";
+import { ApiError } from "@/lib/api";
+import { bookingService } from "@/services/booking.service";
 import { BookingData } from "@/types";
 
 import StepService from "./step-service";
@@ -40,6 +43,7 @@ const initialBookingData: BookingData = {
 export default function BookingStepper() {
   const [currentStep, setCurrentStep] = useState(0);
   const [bookingData, setBookingData] = useState<BookingData>(initialBookingData);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleNext = () => {
     if (currentStep < steps.length - 1) setCurrentStep(prev => prev + 1);
@@ -54,12 +58,35 @@ export default function BookingStepper() {
   };
 
   const handleConfirm = async () => {
+    if (!bookingData.professionalId || !bookingData.serviceId || !bookingData.selectedDate || !bookingData.selectedTime) {
+      toast.error("Preencha todos os campos obrigatórios");
+      return;
+    }
+
     try {
-      // TODO: Implement API call to create appointment
-      console.log("Booking data:", bookingData);
+      setIsSubmitting(true);
+
+      await bookingService.createAppointment({
+        professionalId: bookingData.professionalId,
+        serviceId: bookingData.serviceId,
+        date: bookingData.selectedDate,
+        startTime: bookingData.selectedTime,
+        client: {
+          name: bookingData.clientName,
+          phone: bookingData.clientPhone,
+          whatsapp: bookingData.clientPhone,
+          email: bookingData.clientEmail,
+          notes: bookingData.notes,
+        },
+      });
+
+      toast.success("Agendamento confirmado com sucesso!");
       handleNext();
     } catch (error) {
-      console.error("Erro ao confirmar agendamento:", error);
+      const message = error instanceof ApiError ? error.message : "Erro ao confirmar agendamento";
+      toast.error(message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -97,7 +124,7 @@ export default function BookingStepper() {
             {currentStep === 2 && <StepDate data={bookingData} updateData={updateData} onNext={handleNext} />}
             {currentStep === 3 && <StepTime data={bookingData} updateData={updateData} onNext={handleNext} />}
             {currentStep === 4 && <StepDetails data={bookingData} updateData={updateData} onNext={handleNext} />}
-            {currentStep === 5 && <StepSummary data={bookingData} onEdit={setCurrentStep} onConfirm={handleConfirm} />}
+            {currentStep === 5 && <StepSummary data={bookingData} onEdit={setCurrentStep} onConfirm={handleConfirm} isSubmitting={isSubmitting} />}
             {currentStep === 6 && <StepConfirmation data={bookingData} />}
           </motion.div>
         </AnimatePresence>

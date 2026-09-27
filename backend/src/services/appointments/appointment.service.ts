@@ -57,6 +57,20 @@ export class AppointmentService {
     });
   }
 
+  async list(filters: { status?: AppointmentStatus; date?: Date; dateFrom?: Date; dateTo?: Date; professionalId?: string; query?: string }, page: number, limit: number) {
+    const [data, total] = await Promise.all([
+      appointmentRepo.findAll(filters, (page - 1) * limit, limit),
+      appointmentRepo.count(filters)
+    ]);
+    return { data, total };
+  }
+
+  async getById(id: string) {
+    const appointment = await appointmentRepo.findById(id);
+    if (!appointment) throw new Error('Agendamento não encontrado');
+    return appointment;
+  }
+
   async updateStatus(id: string, status: AppointmentStatus, extras?: Record<string, any>) {
     const appt = await appointmentRepo.updateStatus(id, status, extras);
     if (status === 'CANCELLED') {
@@ -66,8 +80,12 @@ export class AppointmentService {
     return appt;
   }
 
-  async reschedule(id: string, date: Date, startTime: string) {
-    const appt = await appointmentRepo.reschedule(id, date, startTime, startTime);
+  async reschedule(id: string, date: Date, startTime: string, endTime?: string) {
+    const existing = await appointmentRepo.findById(id);
+    if (!existing) throw new Error('Agendamento não encontrado');
+    const conflict = await appointmentRepo.findConflicting(existing.professionalId, date, startTime);
+    if (conflict && conflict.id !== id) throw new ConflictError('Horário não disponível');
+    const appt = await appointmentRepo.reschedule(id, date, startTime, endTime || existing.endTime);
     const fullAppt = await prisma.appointment.findUnique({ where: { id }, include: { client: true } });
     if (fullAppt?.client) await whatsappService.sendReschedule(fullAppt);
     return appt;

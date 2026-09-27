@@ -35,8 +35,8 @@ export const APPOINTMENT_STATUS_INFO = {
 
 export const BUDGET_STATUS_INFO = {
   [BudgetStatus.PENDING]: { label: 'Pendente', color: 'bg-yellow-500' },
-  [BudgetStatus.REVIEWING]: { label: 'Em Análise', color: 'bg-blue-500' },
-  [BudgetStatus.APPROVED]: { label: 'Aprovado', color: 'bg-green-500' },
+  [BudgetStatus.RESPONDED]: { label: 'Respondido', color: 'bg-blue-500' },
+  [BudgetStatus.CONVERTED]: { label: 'Convertido', color: 'bg-green-500' },
   [BudgetStatus.REJECTED]: { label: 'Recusado', color: 'bg-red-500' }
 };
 

@@ -61,7 +61,7 @@ export default function Testimonials() {
                 </div>
                 
                 <p className="text-xl md:text-2xl font-medium text-white mb-8 italic">
-                  "{testimonials[currentIndex].text}"
+                  &quot;{testimonials[currentIndex].text}&quot;
                 </p>
                 
                 <div>

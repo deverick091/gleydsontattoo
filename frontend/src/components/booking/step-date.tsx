@@ -57,7 +57,7 @@ export default function StepDate({ data, updateData, onNext }: StepComponentProp
                 key={i}
                 disabled={isDisabled}
                 onClick={() => {
-                  updateData({ selectedDate: day.toISOString() });
+                  updateData({ selectedDate: format(day, "yyyy-MM-dd") });
                   setTimeout(onNext, 300);
                 }}
                 className={`h-10 w-full rounded-lg text-sm font-medium transition-colors flex items-center justify-center

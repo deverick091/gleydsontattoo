@@ -4,6 +4,10 @@ import { Prisma } from '@prisma/client';
 const repo = new ClientRepository();
 
 export class ClientService {
+  async list(page: number, limit: number) {
+    return repo.findAll((page - 1) * limit, limit);
+  }
+
   async create(data: Prisma.ClientCreateInput) { return repo.create(data); }
   async update(id: string, data: Prisma.ClientUpdateInput) { return repo.update(id, data); }
   async getById(id: string) { return repo.getWithHistory(id); }

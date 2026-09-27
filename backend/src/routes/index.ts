@@ -10,6 +10,12 @@ import settingsRoutes from './settings.routes';
 import notificationRoutes from './notification.routes';
 import userRoutes from './user.routes';
 import auditRoutes from './audit.routes';
+import professionalRoutes from './professional.routes';
+
+import { authenticate } from '../middleware/auth';
+import { authorize } from '../middleware/rbac';
+
+const adminAccess = [authenticate, authorize('ADMIN', 'ATTENDANT')];
 
 const router = Router();
 
@@ -22,6 +28,7 @@ router.use('/budgets', budgetRoutes);
 router.use('/schedule', scheduleRoutes);
 router.use('/settings', settingsRoutes);
 router.use('/notifications', notificationRoutes);
+router.use('/professionals', professionalRoutes);
 router.use('/users', userRoutes);
 router.use('/audit', auditRoutes);
 

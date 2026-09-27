@@ -8,8 +8,8 @@ export enum AppointmentStatus {
 
 export enum BudgetStatus {
   PENDING = 'PENDING',
-  REVIEWING = 'REVIEWING',
-  APPROVED = 'APPROVED',
+  RESPONDED = 'RESPONDED',
+  CONVERTED = 'CONVERTED',
   REJECTED = 'REJECTED'
 }
 
@@ -82,7 +82,30 @@ export interface Professional {
   name: string;
   bio?: string;
   specialties: string[];
-  userId: string;
+  userId?: string | null;
+}
+
+export interface BookingProfessional extends Professional {
+  email: string;
+  phone: string;
+  avatar?: string | null;
+  isActive: boolean;
+}
+
+export interface BookingService {
+  id: string;
+  name: string;
+  description?: string | null;
+  duration: number;
+  priceMin?: string | number | null;
+  priceMax?: string | number | null;
+  priceType: "FIXED" | "STARTING_AT" | "CONSULTATION";
+  isActive: boolean;
+}
+
+export interface BookingTimeSlot {
+  startTime: string;
+  endTime: string;
 }
 
 export interface ServiceCategory {

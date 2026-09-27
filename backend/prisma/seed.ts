@@ -1,4 +1,4 @@
-import { PrismaClient, UserRole, PriceType, BlockedTimeReason } from '@prisma/client';
+import { PrismaClient, Role, PriceType, BlockReason } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
@@ -20,7 +20,7 @@ async function main() {
       email: adminEmail,
       password: hashedPassword,
       name: adminName,
-      role: UserRole.ADMIN,
+      role: Role.ADMIN,
       isActive: true,
     },
   });
@@ -28,7 +28,7 @@ async function main() {
 
   // ── Professional ──
   const professional = await prisma.professional.upsert({
-    where: { email: 'gleydson@gleydsontattoo.com' },
+    where: { userId: admin.id },
     update: {},
     create: {
       name: 'Gleydson',
