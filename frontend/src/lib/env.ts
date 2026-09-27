@@ -1,10 +1,10 @@
 import { z } from 'zod';
 
 const envSchema = z.object({
-  NEXT_PUBLIC_API_URL: z.string().url('URL da API inválida').default('http://localhost:3001'),
-  NEXT_PUBLIC_WHATSAPP_NUMBER: z.string().regex(/^\d{10,15}$/, 'Número do WhatsApp inválido').optional(),
-  NEXT_PUBLIC_SUPABASE_URL: z.string().url('URL do Supabase inválida').optional(),
-  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: z.string().min(1).optional(),
+  NEXT_PUBLIC_API_URL: z.string().default(''),
+  NEXT_PUBLIC_WHATSAPP_NUMBER: z.string().optional(),
+  NEXT_PUBLIC_SUPABASE_URL: z.string().optional(),
+  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: z.string().optional(),
 });
 
 type Env = z.infer<typeof envSchema>;

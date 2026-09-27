@@ -1,0 +1,8 @@
+{
+  "name": "Gleydson Tattoo",
+  "description": "Estúdio de tatuagem em Barcarena, PA. Especialistas em Realismo, Blackwork e Fine Line.",
+  "permissions": [],
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

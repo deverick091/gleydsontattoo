@@ -3,8 +3,17 @@
 import { Bell, User, LogOut } from "lucide-react";
 import AdminSidebar from "./admin-sidebar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { useAuth } from "@/hooks/use-auth";
+import { useRouter } from "next/navigation";
 
 export default function AdminLayoutComponent({ children }: { children: React.ReactNode }) {
+  const { logout } = useAuth();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    logout();
+    router.push("/auth/login");
+  };
   return (
     <div className="min-h-screen bg-zinc-950 text-white">
       <AdminSidebar />
@@ -32,7 +41,7 @@ export default function AdminLayoutComponent({ children }: { children: React.Rea
                 <DropdownMenuItem className="cursor-pointer">
                   <User className="mr-2 h-4 w-4" /> Meu Perfil
                 </DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer text-error focus:text-error">
+                <DropdownMenuItem className="cursor-pointer text-error focus:text-error" onClick={handleLogout}>
                   <LogOut className="mr-2 h-4 w-4" /> Sair
                 </DropdownMenuItem>
               </DropdownMenuContent>
