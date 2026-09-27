@@ -3,5 +3,17 @@
     "allow": [
       "Bash(git -C .. ls-files backend/package-lock.json backend/package.json backend/vercel.json backend/tsconfig.json backend/api/index.ts)"
     ]
+  },
+  "enabledPlugins": {
+    "code-review@claude-plugins-official": true,
+    "frontend-design@claude-plugins-official": true,
+    "context7@claude-plugins-official": true,
+    "code-simplifier@claude-plugins-official": true,
+    "github@claude-plugins-official": true,
+    "vercel@claude-plugins-official": true,
+    "typescript-lsp@claude-plugins-official": true,
+    "supabase@claude-plugins-official": true,
+    "skill-creator@claude-plugins-official": true,
+    "superpowers@claude-plugins-official": true
   }
 }
