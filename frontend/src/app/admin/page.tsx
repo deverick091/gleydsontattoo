@@ -30,7 +30,7 @@ export default function AdminDashboard() {
     async function loadDashboard() {
       try {
         const result = await adminDashboardService.getStats();
-        setStats(result.data);
+        setStats(result);
       } catch (e) {
         console.error('Erro ao carregar dashboard:', e);
       } finally {
