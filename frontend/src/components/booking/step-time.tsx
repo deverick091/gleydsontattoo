@@ -22,7 +22,7 @@ export default function StepTime({ data, updateData, onNext }: StepComponentProp
     : "Data não selecionada";
 
   const loadSlots = async () => {
-    if (!selectedDate) {
+    if (!selectedDate || !data.professionalId) {
       setSlots([]);
       setIsLoading(false);
       return;

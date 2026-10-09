@@ -70,8 +70,9 @@ export const bookingService = {
       const defaultSlots: BookingTimeSlot[] = [];
       for (let h = 9; h <= 18; h++) {
         const hour = h.toString().padStart(2, '0');
-        defaultSlots.push({ startTime: `${hour}:00` });
-        if (h !== 18) defaultSlots.push({ startTime: `${hour}:30` });
+        const nextHour = (h + 1).toString().padStart(2, '0');
+        defaultSlots.push({ startTime: `${hour}:00`, endTime: `${hour}:30` });
+        if (h !== 18) defaultSlots.push({ startTime: `${hour}:30`, endTime: `${nextHour}:00` });
       }
       return defaultSlots;
     }
