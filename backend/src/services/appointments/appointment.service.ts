@@ -20,7 +20,7 @@ export class AppointmentService {
     const conflict = await appointmentRepo.findConflicting(data.date, data.time);
     if (conflict) throw new ConflictError('Horário não disponível');
 
-    return prisma.$transaction(async (tx) => {
+    return prisma.$transaction(async (tx: any) => {
       let client = await tx.client.findFirst({ where: { phone: data.client.phone } });
       if (!client) {
         client = await tx.client.create({

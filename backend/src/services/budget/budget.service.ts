@@ -14,7 +14,7 @@ export class BudgetService {
   }
 
   async create(data: { clientName: string; clientPhone: string; description?: string }) {
-    return prisma.$transaction(async (tx) => {
+    return prisma.$transaction(async (tx: any) => {
       let client = await tx.client.findFirst({ where: { phone: data.clientPhone } });
       if (!client) {
         client = await tx.client.create({
