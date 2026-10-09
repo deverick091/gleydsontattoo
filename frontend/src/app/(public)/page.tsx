@@ -1,31 +1,21 @@
 import { Metadata } from "next";
-import Hero from "@/components/home/hero";
-import AboutSection from "@/components/home/about-section";
-import ServicesPreview from "@/components/home/services-preview";
-import PortfolioPreview from "@/components/home/portfolio-preview";
-import ProcessSection from "@/components/home/process-section";
-import Testimonials from "@/components/home/testimonials";
-import LocationSection from "@/components/home/location-section";
-import FAQSection from "@/components/home/faq-section";
-import CTASection from "@/components/home/cta-section";
+import BookingStepper from "@/components/booking/booking-stepper";
+import SectionHeader from "@/components/shared/section-header";
 
 export const metadata: Metadata = {
-  title: "Gleydson Tattoo | Estúdio de Tatuagem Premium",
-  description: "Estúdio de tatuagem em Barcarena, PA. Especialistas em Realismo, Blackwork e Fine Line. Marque sua história com a gente.",
+  title: "Agendar Horário | Gleydson Tattoo",
+  description: "Agende sua sessão de tatuagem ou piercing de forma rápida e prática.",
 };
 
 export default function HomePage() {
   return (
-    <main className="flex flex-col min-h-screen">
-      <Hero />
-      <AboutSection />
-      <ServicesPreview />
-      <PortfolioPreview />
-      <ProcessSection />
-      <Testimonials />
-      <LocationSection />
-      <FAQSection />
-      <CTASection />
-    </main>
+    <div className="min-h-screen bg-black pt-24 pb-12">
+      <div className="container mx-auto px-4">
+        <SectionHeader title="Agendar Horário" subtitle="Preencha os passos abaixo para garantir seu horário." />
+        <div className="max-w-4xl mx-auto mt-12 bg-zinc-900 border border-border rounded-2xl overflow-hidden shadow-2xl">
+          <BookingStepper />
+        </div>
+      </div>
+    </div>
   );
 }

@@ -1,63 +1,66 @@
 import { AppointmentRepository } from '../../repositories/appointments/appointment.repository.js';
 import { ClientRepository } from '../../repositories/clients/client.repository.js';
-import { WhatsAppService } from '../whatsapp/whatsapp.service.js';
 import { ConflictError } from '../../helpers/errors.js';
 import prisma from '../../config/database.js';
 import { Prisma, AppointmentStatus } from '@prisma/client';
 
 const appointmentRepo = new AppointmentRepository();
 const clientRepo = new ClientRepository();
-const whatsappService = new WhatsAppService();
 
 interface CreateAppointmentInput {
-  professionalId: string;
   serviceId: string;
   date: Date;
-  startTime: string;
-  endTime: string;
-  client: { phone: string; name: string; email?: string; notes?: string; bodyRegion?: string; stylePreference?: string; referenceImages?: string[] };
+  time: string;
+  client: { phone: string; name: string; email?: string; notes?: string; };
 }
 
 export class AppointmentService {
   async create(data: CreateAppointmentInput) {
-    const conflict = await appointmentRepo.findConflicting(data.professionalId, data.date, data.startTime);
+    // simplified conflict check: date and time
+    const conflict = await appointmentRepo.findConflicting(data.date, data.time);
     if (conflict) throw new ConflictError('Horário não disponível');
 
     return prisma.$transaction(async (tx) => {
-      let client = await clientRepo.findByPhone(data.client.phone);
+      let client = await tx.client.findFirst({ where: { phone: data.client.phone } });
       if (!client) {
         client = await tx.client.create({
           data: {
             name: data.client.name,
             email: data.client.email || '',
             phone: data.client.phone,
-            whatsapp: data.client.phone
+            notes: data.client.notes
           }
         });
+      } else {
+        // Se o cliente já existir com o mesmo telefone, atualiza o nome se foi alterado
+        if (client.name !== data.client.name || (data.client.email && client.email !== data.client.email)) {
+          client = await tx.client.update({
+            where: { id: client.id },
+            data: {
+              name: data.client.name,
+              ...(data.client.email ? { email: data.client.email } : {})
+            }
+          });
+        }
       }
 
       const appointment = await tx.appointment.create({
         data: {
+          clientName: data.client.name,
+          clientPhone: data.client.phone,
           clientId: client.id,
-          professionalId: data.professionalId,
           serviceId: data.serviceId,
           date: data.date,
-          startTime: data.startTime,
-          endTime: data.endTime,
-          notes: data.client.notes,
-          bodyRegion: data.client.bodyRegion,
-          stylePreference: data.client.stylePreference,
-          referenceImages: data.client.referenceImages || []
+          time: data.time
         },
-        include: { client: true, professional: true, service: true }
+        include: { client: true, service: true }
       });
 
-      await whatsappService.sendBookingConfirmation(appointment);
       return appointment;
     });
   }
 
-  async list(filters: { status?: AppointmentStatus; date?: Date; dateFrom?: Date; dateTo?: Date; professionalId?: string; query?: string }, page: number, limit: number) {
+  async list(filters: { status?: AppointmentStatus; date?: Date; dateFrom?: Date; dateTo?: Date; query?: string }, page: number, limit: number) {
     const [data, total] = await Promise.all([
       appointmentRepo.findAll(filters, (page - 1) * limit, limit),
       appointmentRepo.count(filters)
@@ -71,23 +74,15 @@ export class AppointmentService {
     return appointment;
   }
 
-  async updateStatus(id: string, status: AppointmentStatus, extras?: Record<string, any>) {
-    const appt = await appointmentRepo.updateStatus(id, status, extras);
-    if (status === 'CANCELLED') {
-      const fullAppt = await prisma.appointment.findUnique({ where: { id }, include: { client: true } });
-      if (fullAppt?.client) await whatsappService.sendCancellation(fullAppt);
-    }
-    return appt;
+  async updateStatus(id: string, status: AppointmentStatus) {
+    return appointmentRepo.updateStatus(id, status);
   }
 
-  async reschedule(id: string, date: Date, startTime: string, endTime?: string) {
+  async reschedule(id: string, date: Date, time: string) {
     const existing = await appointmentRepo.findById(id);
     if (!existing) throw new Error('Agendamento não encontrado');
-    const conflict = await appointmentRepo.findConflicting(existing.professionalId, date, startTime);
+    const conflict = await appointmentRepo.findConflicting(date, time);
     if (conflict && conflict.id !== id) throw new ConflictError('Horário não disponível');
-    const appt = await appointmentRepo.reschedule(id, date, startTime, endTime || existing.endTime);
-    const fullAppt = await prisma.appointment.findUnique({ where: { id }, include: { client: true } });
-    if (fullAppt?.client) await whatsappService.sendReschedule(fullAppt);
-    return appt;
+    return appointmentRepo.reschedule(id, date, time);
   }
 }

@@ -1,42 +1,46 @@
 import { BudgetRepository } from '../../repositories/budget/budget.repository';
 import { Prisma, BudgetStatus } from '@prisma/client';
-import { AppointmentService } from '../appointments/appointment.service';
+import prisma from '../../config/database';
 
-const repo = new BudgetRepository();
-const appointmentService = new AppointmentService();
+const budgetRepo = new BudgetRepository();
 
 export class BudgetService {
-  async getById(id: string) {
-    const budget = await repo.findById(id);
-    if (!budget) throw new Error('Orçamento não encontrado');
-    return budget;
+  async list(status?: BudgetStatus) {
+    return budgetRepo.findAll(status);
   }
-  async updateStatus(id: string, status: Prisma.BudgetUpdateInput['status']) {
-    return repo.updateStatus(id, status as BudgetStatus);
+
+  async findById(id: string) {
+    return budgetRepo.findById(id);
   }
-  async convert(id: string, data: { professionalId: string; serviceId: string; date: Date; startTime: string; endTime: string }) {
-    const budget = await repo.findById(id);
-    if (!budget) throw new Error('Orçamento não encontrado');
-    if (budget.status === BudgetStatus.CONVERTED) throw new Error('Orçamento já convertido');
-    const appointment = await appointmentService.create({
-      professionalId: data.professionalId,
-      serviceId: data.serviceId,
-      date: data.date,
-      startTime: data.startTime,
-      endTime: data.endTime,
-      client: {
-        name: budget.name,
-        phone: budget.whatsapp,
-        email: budget.email || undefined,
-        notes: budget.description || undefined,
-        bodyRegion: budget.bodyRegion || undefined,
-        stylePreference: budget.style || undefined,
-        referenceImages: budget.referenceImages
+
+  async create(data: { clientName: string; clientPhone: string; description?: string }) {
+    return prisma.$transaction(async (tx) => {
+      let client = await tx.client.findFirst({ where: { phone: data.clientPhone } });
+      if (!client) {
+        client = await tx.client.create({
+          data: { name: data.clientName, phone: data.clientPhone }
+        });
       }
+
+      return tx.budget.create({
+        data: {
+          clientName: data.clientName,
+          clientId: client.id,
+          description: data.description,
+        }
+      });
     });
-    return repo.updateStatus(id, BudgetStatus.CONVERTED, appointment.id);
   }
-  async create(data: Prisma.BudgetCreateInput) { return repo.create(data); }
-  async respond(id: string, response: string) { return repo.respond(id, response); }
-  async getAll(page: number, limit: number) { return repo.findAll((page - 1) * limit, limit); }
+
+  async respond(id: string, body: Record<string, any>) {
+    return budgetRepo.update(id, { ...body, status: 'RESPONDED' as BudgetStatus });
+  }
+
+  async updateStatus(id: string, status: BudgetStatus) {
+    return budgetRepo.update(id, { status });
+  }
+
+  async convert(id: string) {
+    return budgetRepo.update(id, { status: 'CONVERTED' as BudgetStatus });
+  }
 }

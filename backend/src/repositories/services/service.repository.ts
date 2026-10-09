@@ -4,28 +4,19 @@ import { Prisma } from '@prisma/client';
 export class ServiceRepository {
   async findAll() {
     return prisma.service.findMany({
-      include: { category: true },
-      orderBy: [{ category: { order: 'asc' } }, { order: 'asc' }]
+      orderBy: { name: 'asc' }
     });
   }
 
   async findActive() {
     return prisma.service.findMany({
-      where: { isActive: true },
-      include: { category: true },
-      orderBy: [{ category: { order: 'asc' } }, { order: 'asc' }]
+      where: { active: true },
+      orderBy: { name: 'asc' }
     });
   }
 
   async findById(id: string) {
-    return prisma.service.findUnique({ where: { id }, include: { category: true } });
-  }
-
-  async findByCategory(categoryId: string) {
-    return prisma.service.findMany({
-      where: { categoryId, isActive: true },
-      orderBy: { order: 'asc' }
-    });
+    return prisma.service.findUnique({ where: { id } });
   }
 
   async create(data: Prisma.ServiceUncheckedCreateInput) {

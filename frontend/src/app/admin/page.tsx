@@ -1,23 +1,80 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, CalendarCheck, TrendingUp, CheckCircle } from "lucide-react";
+import { Users, CalendarCheck, TrendingUp, Clock } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { adminAppointmentService, AdminAppointment } from "@/services/admin.service";
+import { AppointmentStatus } from "@/types";
 
-const data = [
-  { name: 'Seg', Agendamentos: 4 },
-  { name: 'Ter', Agendamentos: 3 },
-  { name: 'Qua', Agendamentos: 2 },
-  { name: 'Qui', Agendamentos: 6 },
-  { name: 'Sex', Agendamentos: 8 },
-  { name: 'Sáb', Agendamentos: 9 },
-];
+interface DashboardStats {
+  todayCount: number;
+  pendingCount: number;
+  confirmedCount: number;
+  completedCount: number;
+  todayAppointments: AdminAppointment[];
+  weekData: { name: string; Agendamentos: number }[];
+}
+
+const DAY_NAMES = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+
+function toLocalDateStr(date: Date) {
+  return date.toISOString().split('T')[0];
+}
 
 export default function AdminDashboard() {
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadDashboard() {
+      try {
+        // Load all appointments with a broad range
+        const result = await adminAppointmentService.list({ limit: "200" });
+        const all = result.data;
+
+        const today = new Date();
+        const todayStr = toLocalDateStr(today);
+
+        // Today's appointments
+        const todayAppointments = all.filter(a => a.date === todayStr || a.date?.startsWith(todayStr));
+
+        // Status counts
+        const pendingCount = all.filter(a => a.status === AppointmentStatus.PENDING).length;
+        const confirmedCount = all.filter(a => a.status === AppointmentStatus.CONFIRMED).length;
+        const completedCount = all.filter(a => a.status === AppointmentStatus.COMPLETED).length;
+
+        // Build last 7 days chart data
+        const weekData = [];
+        for (let i = 6; i >= 0; i--) {
+          const d = new Date();
+          d.setDate(d.getDate() - i);
+          const dStr = toLocalDateStr(d);
+          const count = all.filter(a => a.date === dStr || a.date?.startsWith(dStr)).length;
+          weekData.push({ name: DAY_NAMES[d.getDay()], Agendamentos: count });
+        }
+
+        setStats({
+          todayCount: todayAppointments.length,
+          pendingCount,
+          confirmedCount,
+          completedCount,
+          todayAppointments: todayAppointments.sort((a, b) => a.startTime.localeCompare(b.startTime)),
+          weekData,
+        });
+      } catch (e) {
+        console.error('Erro ao carregar dashboard:', e);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadDashboard();
+  }, []);
+
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold text-white mb-8">Dashboard</h1>
-      
+
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <Card className="bg-zinc-900 border-zinc-800">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -25,41 +82,49 @@ export default function AdminDashboard() {
             <CalendarCheck className="h-4 w-4 text-accent" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white">4</div>
-            <p className="text-xs text-muted">+2 em relação a ontem</p>
+            <div className="text-2xl font-bold text-white">
+              {loading ? "..." : stats?.todayCount ?? 0}
+            </div>
+            <p className="text-xs text-muted">agendamentos para hoje</p>
           </CardContent>
         </Card>
-        
+
         <Card className="bg-zinc-900 border-zinc-800">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted">Novos Clientes (Mês)</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted">Pendentes</CardTitle>
+            <Clock className="h-4 w-4 text-accent" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-white">
+              {loading ? "..." : stats?.pendingCount ?? 0}
+            </div>
+            <p className="text-xs text-muted">aguardando confirmação</p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-zinc-900 border-zinc-800">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-muted">Confirmados</CardTitle>
             <Users className="h-4 w-4 text-accent" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white">24</div>
-            <p className="text-xs text-muted">+12% vs último mês</p>
+            <div className="text-2xl font-bold text-white">
+              {loading ? "..." : stats?.confirmedCount ?? 0}
+            </div>
+            <p className="text-xs text-muted">agendamentos confirmados</p>
           </CardContent>
         </Card>
-        
+
         <Card className="bg-zinc-900 border-zinc-800">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted">Faturamento</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted">Concluídos</CardTitle>
             <TrendingUp className="h-4 w-4 text-accent" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white">R$ 8.450</div>
-            <p className="text-xs text-muted text-success">+4.5% vs último mês</p>
-          </CardContent>
-        </Card>
-        
-        <Card className="bg-zinc-900 border-zinc-800">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted">Taxa de Comparecimento</CardTitle>
-            <CheckCircle className="h-4 w-4 text-accent" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-white">92%</div>
-            <p className="text-xs text-muted">Excelente</p>
+            <div className="text-2xl font-bold text-white">
+              {loading ? "..." : stats?.completedCount ?? 0}
+            </div>
+            <p className="text-xs text-muted">serviços realizados</p>
           </CardContent>
         </Card>
       </div>
@@ -67,18 +132,22 @@ export default function AdminDashboard() {
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7 mt-8">
         <Card className="col-span-4 bg-zinc-900 border-zinc-800">
           <CardHeader>
-            <CardTitle className="text-white">Agendamentos da Semana</CardTitle>
+            <CardTitle className="text-white">Agendamentos — Últimos 7 Dias</CardTitle>
           </CardHeader>
           <CardContent className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={data}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
-                <XAxis dataKey="name" stroke="#a1a1aa" fontSize={12} tickLine={false} axisLine={false} />
-                <YAxis stroke="#a1a1aa" fontSize={12} tickLine={false} axisLine={false} />
-                <Tooltip cursor={{fill: '#27272a'}} contentStyle={{backgroundColor: '#09090b', border: '1px solid #27272a'}} />
-                <Bar dataKey="Agendamentos" fill="#C9A96E" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+            {loading ? (
+              <div className="flex items-center justify-center h-full text-zinc-500">Carregando...</div>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={stats?.weekData ?? []}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
+                  <XAxis dataKey="name" stroke="#a1a1aa" fontSize={12} tickLine={false} axisLine={false} />
+                  <YAxis stroke="#a1a1aa" fontSize={12} tickLine={false} axisLine={false} allowDecimals={false} />
+                  <Tooltip cursor={{ fill: '#27272a' }} contentStyle={{ backgroundColor: '#09090b', border: '1px solid #27272a' }} />
+                  <Bar dataKey="Agendamentos" fill="#C9A96E" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            )}
           </CardContent>
         </Card>
 
@@ -87,23 +156,26 @@ export default function AdminDashboard() {
             <CardTitle className="text-white">Próximos Hoje</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {[
-                { time: '14:00', client: 'João Silva', service: 'Tatuagem', status: 'Confirmado' },
-                { time: '16:00', client: 'Maria Costa', service: 'Piercing', status: 'Pendente' },
-              ].map((item, i) => (
-                <div key={i} className="flex items-center justify-between border-b border-zinc-800 pb-4 last:border-0 last:pb-0">
-                  <div>
-                    <p className="font-medium text-white">{item.client}</p>
-                    <p className="text-sm text-muted">{item.service}</p>
+            {loading ? (
+              <p className="text-zinc-500 text-sm">Carregando...</p>
+            ) : !stats?.todayAppointments.length ? (
+              <p className="text-zinc-500 text-sm">Nenhum agendamento para hoje.</p>
+            ) : (
+              <div className="space-y-4">
+                {stats.todayAppointments.map((item) => (
+                  <div key={item.id} className="flex items-center justify-between border-b border-zinc-800 pb-4 last:border-0 last:pb-0">
+                    <div>
+                      <p className="font-medium text-white">{item.client.name}</p>
+                      <p className="text-sm text-muted">{item.service.name}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-medium text-accent">{item.startTime}</p>
+                      <p className="text-xs text-muted capitalize">{item.status.toLowerCase()}</p>
+                    </div>
                   </div>
-                  <div className="text-right">
-                    <p className="font-medium text-accent">{item.time}</p>
-                    <p className="text-xs text-muted">{item.status}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

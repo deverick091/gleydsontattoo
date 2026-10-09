@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, ChevronLeft } from "lucide-react";
@@ -10,7 +10,6 @@ import { bookingService } from "@/services/booking.service";
 import { BookingData } from "@/types";
 
 import StepService from "./step-service";
-import StepProfessional from "./step-professional";
 import StepDate from "./step-date";
 import StepTime from "./step-time";
 import StepDetails from "./step-details";
@@ -19,7 +18,6 @@ import StepConfirmation from "./step-confirmation";
 
 const steps = [
   "Serviço",
-  "Profissional",
   "Data",
   "Horário",
   "Dados",
@@ -45,6 +43,24 @@ export default function BookingStepper() {
   const [bookingData, setBookingData] = useState<BookingData>(initialBookingData);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  useEffect(() => {
+    async function loadDefaultProfessional() {
+      try {
+        const professionals = await bookingService.getProfessionals();
+        if (professionals && professionals.length > 0) {
+          setBookingData(prev => ({
+            ...prev,
+            professionalId: professionals[0].id,
+            professionalName: professionals[0].name
+          }));
+        }
+      } catch (error) {
+        console.error("Failed to load professional:", error);
+      }
+    }
+    loadDefaultProfessional();
+  }, []);
+
   const handleNext = () => {
     if (currentStep < steps.length - 1) setCurrentStep(prev => prev + 1);
   };
@@ -58,7 +74,7 @@ export default function BookingStepper() {
   };
 
   const handleConfirm = async () => {
-    if (!bookingData.professionalId || !bookingData.serviceId || !bookingData.selectedDate || !bookingData.selectedTime) {
+    if (!bookingData.serviceId || !bookingData.selectedDate || !bookingData.selectedTime) {
       toast.error("Preencha todos os campos obrigatórios");
       return;
     }
@@ -120,12 +136,11 @@ export default function BookingStepper() {
             className="h-full"
           >
             {currentStep === 0 && <StepService data={bookingData} updateData={updateData} onNext={handleNext} />}
-            {currentStep === 1 && <StepProfessional data={bookingData} updateData={updateData} onNext={handleNext} />}
-            {currentStep === 2 && <StepDate data={bookingData} updateData={updateData} onNext={handleNext} />}
-            {currentStep === 3 && <StepTime data={bookingData} updateData={updateData} onNext={handleNext} />}
-            {currentStep === 4 && <StepDetails data={bookingData} updateData={updateData} onNext={handleNext} />}
-            {currentStep === 5 && <StepSummary data={bookingData} onEdit={setCurrentStep} onConfirm={handleConfirm} isSubmitting={isSubmitting} />}
-            {currentStep === 6 && <StepConfirmation data={bookingData} />}
+            {currentStep === 1 && <StepDate data={bookingData} updateData={updateData} onNext={handleNext} />}
+            {currentStep === 2 && <StepTime data={bookingData} updateData={updateData} onNext={handleNext} />}
+            {currentStep === 3 && <StepDetails data={bookingData} updateData={updateData} onNext={handleNext} />}
+            {currentStep === 4 && <StepSummary data={bookingData} onEdit={setCurrentStep} onConfirm={handleConfirm} isSubmitting={isSubmitting} />}
+            {currentStep === 5 && <StepConfirmation data={bookingData} />}
           </motion.div>
         </AnimatePresence>
       </div>

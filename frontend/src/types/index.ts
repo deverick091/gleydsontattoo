@@ -100,7 +100,8 @@ export interface BookingService {
   priceMin?: string | number | null;
   priceMax?: string | number | null;
   priceType: "FIXED" | "STARTING_AT" | "CONSULTATION";
-  isActive: boolean;
+  isActive?: boolean;
+  active?: boolean;
 }
 
 export interface BookingTimeSlot {

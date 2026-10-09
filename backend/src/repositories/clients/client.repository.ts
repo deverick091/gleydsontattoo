@@ -18,7 +18,7 @@ export class ClientRepository {
   }
 
   async findByPhone(phone: string) {
-    return prisma.client.findFirst({ where: { OR: [{ phone }, { whatsapp: phone }] } });
+    return prisma.client.findFirst({ where: { phone } });
   }
 
   async findByEmail(email: string) {
@@ -52,7 +52,7 @@ export class ClientRepository {
     return prisma.client.findUnique({
       where: { id },
       include: {
-        appointments: { include: { service: true, professional: true }, orderBy: { date: 'desc' } },
+        appointments: { include: { service: true }, orderBy: { date: 'desc' } },
         budgets: { orderBy: { createdAt: 'desc' } }
       }
     });

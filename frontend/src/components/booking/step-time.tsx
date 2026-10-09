@@ -16,13 +16,13 @@ export default function StepTime({ data, updateData, onNext }: StepComponentProp
   const [error, setError] = useState<string | null>(null);
 
   const selectedDate = data.selectedDate?.slice(0, 10);
-  const canLoadSlots = Boolean(data.professionalId && selectedDate);
+  const canLoadSlots = Boolean(selectedDate);
   const dateFormatted = data.selectedDate
     ? format(new Date(data.selectedDate), "dd 'de' MMMM", { locale: ptBR })
     : "Data não selecionada";
 
   const loadSlots = async () => {
-    if (!data.professionalId || !selectedDate) {
+    if (!selectedDate) {
       setSlots([]);
       setIsLoading(false);
       return;

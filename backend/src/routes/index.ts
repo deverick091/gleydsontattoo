@@ -5,17 +5,12 @@ import clientRoutes from './client.routes';
 import serviceRoutes from './service.routes';
 import portfolioRoutes from './portfolio.routes';
 import budgetRoutes from './budget.routes';
-import scheduleRoutes from './schedule.routes';
-import settingsRoutes from './settings.routes';
-import notificationRoutes from './notification.routes';
 import userRoutes from './user.routes';
-import auditRoutes from './audit.routes';
-import professionalRoutes from './professional.routes';
 
 import { authenticate } from '../middleware/auth';
 import { authorize } from '../middleware/rbac';
 
-const adminAccess = [authenticate, authorize('ADMIN', 'ATTENDANT')];
+const adminAccess = [authenticate, authorize('ADMIN')]; // ATTENDANT is gone from Role enum
 
 const router = Router();
 
@@ -25,11 +20,6 @@ router.use('/clients', clientRoutes);
 router.use('/services', serviceRoutes);
 router.use('/portfolio', portfolioRoutes);
 router.use('/budgets', budgetRoutes);
-router.use('/schedule', scheduleRoutes);
-router.use('/settings', settingsRoutes);
-router.use('/notifications', notificationRoutes);
-router.use('/professionals', professionalRoutes);
 router.use('/users', userRoutes);
-router.use('/audit', auditRoutes);
 
 export default router;

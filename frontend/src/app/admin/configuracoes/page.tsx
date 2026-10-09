@@ -1,13 +1,36 @@
 "use client";
 
+import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Copy, Check } from "lucide-react";
 
 export default function AdminConfiguracoes() {
+  const [copied, setCopied] = useState(false);
+  const bookingLink = "http://localhost:3000/";
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(bookingLink);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
     <div className="space-y-6 max-w-4xl">
       <h1 className="text-3xl font-bold text-white">Configurações</h1>
+
+      <div className="bg-zinc-900 border border-zinc-800 p-8 rounded-xl space-y-6">
+        <h3 className="text-xl font-bold text-white border-b border-zinc-800 pb-4">Link de Agendamento</h3>
+        <p className="text-zinc-400 text-sm">Copie o link abaixo e envie para seus clientes realizarem agendamentos.</p>
+        <div className="flex gap-2">
+          <Input readOnly value={bookingLink} className="bg-zinc-800 font-mono text-zinc-300" />
+          <Button onClick={handleCopyLink} variant="secondary" className="w-32">
+            {copied ? <Check className="w-4 h-4 mr-2" /> : <Copy className="w-4 h-4 mr-2" />}
+            {copied ? "Copiado!" : "Copiar Link"}
+          </Button>
+        </div>
+      </div>
 
       <div className="bg-zinc-900 border border-zinc-800 p-8 rounded-xl space-y-6">
         <h3 className="text-xl font-bold text-white border-b border-zinc-800 pb-4">Dados do Estúdio</h3>

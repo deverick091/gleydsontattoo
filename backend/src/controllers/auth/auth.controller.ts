@@ -1,18 +1,21 @@
-import { Response } from 'express';
+import { NextFunction, Response } from 'express';
 import { AuthRequest } from '../../middleware/auth';
 import { AuthService } from '../../services/auth/auth.service';
 import { sendSuccess } from '../../helpers/response';
+import { UnauthorizedError } from '../../helpers/errors';
 
 const service = new AuthService();
 
 export class AuthController {
-  async login(req: AuthRequest, res: Response) {
+  async login(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const data = await service.login(req.body.email, req.body.password);
       return sendSuccess(res, data);
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Erro ao fazer login';
-      res.status(401).json({ success: false, error: { message } });
+      if (error instanceof UnauthorizedError) {
+        return res.status(401).json({ success: false, error: { message: error.message } });
+      }
+      return next(error);
     }
   }
 

@@ -22,7 +22,6 @@ const menuItems = [
   { icon: Calendar, label: "Calendário", href: "/admin/calendario" },
   { icon: Users, label: "Clientes", href: "/admin/clientes" },
   { icon: Scissors, label: "Serviços", href: "/admin/servicos" },
-  { icon: ImageIcon, label: "Portfólio", href: "/admin/portfolio" },
   { icon: Calculator, label: "Orçamentos", href: "/admin/orcamentos" },
   { icon: Settings, label: "Configurações", href: "/admin/configuracoes" },
   { icon: Users, label: "Usuários", href: "/admin/usuarios" },

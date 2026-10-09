@@ -17,7 +17,10 @@ export class UserRepository {
   }
 
   async findByEmail(email: string) {
-    return prisma.user.findUnique({ where: { email } });
+    return prisma.user.findFirst({
+      where: { email: { equals: email, mode: 'insensitive' } },
+      select: { id: true, email: true, name: true, role: true, isActive: true, createdAt: true }
+    });
   }
 
   async create(data: Prisma.UserCreateInput) {
@@ -31,7 +34,7 @@ export class UserRepository {
     return prisma.user.update({
       where: { id },
       data,
-      select: { id: true, email: true, name: true, role: true, isActive: true }
+      select: { id: true, email: true, name: true, role: true, isActive: true, createdAt: true }
     });
   }
 

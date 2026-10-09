@@ -1,38 +1,66 @@
 import { Request, Response } from 'express';
 import { BudgetService } from '../../services/budget/budget.service';
-import { sendSuccess, sendCreated, sendPaginated } from '../../helpers/response';
+import { sendSuccess, sendCreated } from '../../helpers/response';
+import { BudgetStatus } from '@prisma/client';
 
 const service = new BudgetService();
 
 export class BudgetController {
   async list(req: Request, res: Response) {
     try {
-      const page = Math.max(Number(req.query.page) || 1, 1);
-      const limit = Math.min(Math.max(Number(req.query.limit) || 20, 1), 100);
-      const result = await service.getAll(page, limit);
-      return sendPaginated(res, result.data, page, limit, result.total);
-    } catch (error: unknown) { return res.status(400).json({ success: false, error: { message: error instanceof Error ? error.message : 'Erro ao obter orçamentos' } }); }
+      const { status } = req.query;
+      const data = await service.list(status as BudgetStatus);
+      return sendSuccess(res, data);
+    } catch (e: any) {
+      res.status(500).json({ success: false, error: { message: e.message } });
+    }
   }
+
   async getById(req: Request, res: Response) {
-    try { return sendSuccess(res, await service.getById(req.params.id)); }
-    catch (error: unknown) { return res.status(404).json({ success: false, error: { message: error instanceof Error ? error.message : 'Orçamento não encontrado' } }); }
+    try {
+      const data = await service.findById(req.params.id);
+      if (!data) {
+        return res.status(404).json({ success: false, error: { message: 'Orçamento não encontrado' } });
+      }
+      return sendSuccess(res, data);
+    } catch (e: any) {
+      res.status(500).json({ success: false, error: { message: e.message } });
+    }
   }
+
   async create(req: Request, res: Response) {
-    try { return sendCreated(res, await service.create(req.body)); }
-    catch (error: unknown) { return res.status(400).json({ success: false, error: { message: error instanceof Error ? error.message : 'Erro ao criar orçamento' } }); }
+    try {
+      const data = await service.create(req.body);
+      return sendCreated(res, data);
+    } catch (e: any) {
+      res.status(500).json({ success: false, error: { message: e.message } });
+    }
   }
+
   async respond(req: Request, res: Response) {
-    try { return sendSuccess(res, await service.respond(req.params.id, req.body.response)); }
-    catch (error: unknown) { return res.status(400).json({ success: false, error: { message: error instanceof Error ? error.message : 'Erro ao responder orçamento' } }); }
+    try {
+      const data = await service.respond(req.params.id, req.body);
+      return sendSuccess(res, data);
+    } catch (e: any) {
+      res.status(500).json({ success: false, error: { message: e.message } });
+    }
   }
+
   async updateStatus(req: Request, res: Response) {
-    try { return sendSuccess(res, await service.updateStatus(req.params.id, req.body.status)); }
-    catch (error: unknown) { return res.status(400).json({ success: false, error: { message: error instanceof Error ? error.message : 'Erro ao atualizar orçamento' } }); }
+    try {
+      const data = await service.updateStatus(req.params.id, req.body.status as BudgetStatus);
+      return sendSuccess(res, data);
+    } catch (e: any) {
+      res.status(500).json({ success: false, error: { message: e.message } });
+    }
   }
+
   async convert(req: Request, res: Response) {
     try {
-      const result = await service.convert(req.params.id, { ...req.body, date: new Date(`${req.body.date}T00:00:00.000Z`) });
-      return sendSuccess(res, result);
-    } catch (error: unknown) { return res.status(400).json({ success: false, error: { message: error instanceof Error ? error.message : 'Erro ao converter orçamento' } }); }
+      const data = await service.convert(req.params.id);
+      return sendSuccess(res, data);
+    } catch (e: any) {
+      res.status(500).json({ success: false, error: { message: e.message } });
+    }
   }
 }

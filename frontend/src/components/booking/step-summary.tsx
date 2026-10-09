@@ -46,9 +46,8 @@ export default function StepSummary({ data, onEdit, onConfirm, isSubmitting = fa
 
       <div className="bg-zinc-950 border border-zinc-800 rounded-xl p-6">
         <Section title="Serviço" content={data.serviceName} step={0} onEdit={onEdit} />
-        <Section title="Profissional" content={data.professionalName} step={1} onEdit={onEdit} />
-        <Section title="Data" content={dateFormatted} step={2} onEdit={onEdit} />
-        <Section title="Horário" content={data.selectedTime} step={3} onEdit={onEdit} />
+        <Section title="Data" content={dateFormatted} step={1} onEdit={onEdit} />
+        <Section title="Horário" content={data.selectedTime} step={2} onEdit={onEdit} />
 
         <div className="flex justify-between items-start py-4">
           <div>
@@ -58,7 +57,7 @@ export default function StepSummary({ data, onEdit, onConfirm, isSubmitting = fa
             <p className="text-zinc-400 text-sm mt-1">{data.clientEmail}</p>
           </div>
           <button
-            onClick={() => onEdit(4)}
+            onClick={() => onEdit(3)}
             className="p-2 text-muted hover:text-accent transition-colors"
           >
             <Edit2 className="w-4 h-4" />

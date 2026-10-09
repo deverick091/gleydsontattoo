@@ -6,23 +6,52 @@ const service = new PortfolioService();
 
 export class PortfolioController {
   async getAll(req: Request, res: Response) {
-    try { return sendSuccess(res, await service.getAll(req.query.categoryId as string | undefined)); }
-    catch (error: unknown) { return res.status(400).json({ success: false, error: { message: error instanceof Error ? error.message : 'Erro ao obter portfólio' } }); }
+    try {
+      const page = Number(req.query.page) || 1;
+      const limit = Number(req.query.limit) || 10;
+      const data = await service.list(page, limit);
+      return sendSuccess(res, data);
+    } catch (e: any) {
+      res.status(500).json({ success: false, error: { message: e.message } });
+    }
   }
+
   async getById(req: Request, res: Response) {
-    try { return sendSuccess(res, await service.getById(req.params.id)); }
-    catch (error: unknown) { return res.status(404).json({ success: false, error: { message: error instanceof Error ? error.message : 'Item não encontrado' } }); }
+    try {
+      const data = await service.findById(req.params.id);
+      if (!data) {
+        return res.status(404).json({ success: false, error: { message: 'Item não encontrado' } });
+      }
+      return sendSuccess(res, data);
+    } catch (e: any) {
+      res.status(500).json({ success: false, error: { message: e.message } });
+    }
   }
+
   async create(req: Request, res: Response) {
-    try { return sendCreated(res, await service.create(req.body)); }
-    catch (error: unknown) { return res.status(400).json({ success: false, error: { message: error instanceof Error ? error.message : 'Erro ao criar item' } }); }
+    try {
+      const data = await service.create(req.body);
+      return sendCreated(res, data);
+    } catch (e: any) {
+      res.status(500).json({ success: false, error: { message: e.message } });
+    }
   }
+
   async update(req: Request, res: Response) {
-    try { return sendSuccess(res, await service.update(req.params.id, req.body)); }
-    catch (error: unknown) { return res.status(400).json({ success: false, error: { message: error instanceof Error ? error.message : 'Erro ao atualizar item' } }); }
+    try {
+      const data = await service.update(req.params.id, req.body);
+      return sendSuccess(res, data);
+    } catch (e: any) {
+      res.status(500).json({ success: false, error: { message: e.message } });
+    }
   }
+
   async delete(req: Request, res: Response) {
-    try { return sendSuccess(res, await service.delete(req.params.id)); }
-    catch (error: unknown) { return res.status(400).json({ success: false, error: { message: error instanceof Error ? error.message : 'Erro ao excluir item' } }); }
+    try {
+      await service.delete(req.params.id);
+      return sendSuccess(res, { message: 'Item removido com sucesso' });
+    } catch (e: any) {
+      res.status(500).json({ success: false, error: { message: e.message } });
+    }
   }
 }

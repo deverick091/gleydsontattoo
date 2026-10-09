@@ -2,27 +2,27 @@ import prisma from '../../config/database';
 import { AppointmentStatus, Prisma } from '@prisma/client';
 
 export class AppointmentRepository {
-  async findAll(filters: { status?: AppointmentStatus; date?: Date; dateFrom?: Date; dateTo?: Date; professionalId?: string; query?: string }, skip: number, take: number) {
+  async findAll(filters: { status?: AppointmentStatus; date?: Date; dateFrom?: Date; dateTo?: Date; query?: string }, skip: number, take: number) {
     const { date, dateFrom, dateTo, query, ...rest } = filters;
     const where: Prisma.AppointmentWhereInput = {
       ...rest,
       ...(date ? { date } : dateFrom || dateTo ? { date: { ...(dateFrom ? { gte: dateFrom } : {}), ...(dateTo ? { lte: dateTo } : {}) } } : {}),
-      ...(query ? { client: { OR: [{ name: { contains: query, mode: 'insensitive' } }, { phone: { contains: query } }, { email: { contains: query, mode: 'insensitive' } }] } } : {})
+      ...(query ? { OR: [{ clientName: { contains: query, mode: 'insensitive' } }, { clientPhone: { contains: query } }] } : {})
     };
     return prisma.appointment.findMany({
       where,
       skip, take,
-      include: { client: true, service: true, professional: true },
-      orderBy: [{ date: 'asc' }, { startTime: 'asc' }]
+      include: { client: true, service: true },
+      orderBy: [{ date: 'asc' }, { time: 'asc' }]
     });
   }
 
-  async count(filters: { status?: AppointmentStatus; date?: Date; dateFrom?: Date; dateTo?: Date; professionalId?: string; query?: string }) {
+  async count(filters: { status?: AppointmentStatus; date?: Date; dateFrom?: Date; dateTo?: Date; query?: string }) {
     const { date, dateFrom, dateTo, query, ...rest } = filters;
     const where: Prisma.AppointmentWhereInput = {
       ...rest,
       ...(date ? { date } : dateFrom || dateTo ? { date: { ...(dateFrom ? { gte: dateFrom } : {}), ...(dateTo ? { lte: dateTo } : {}) } } : {}),
-      ...(query ? { client: { OR: [{ name: { contains: query, mode: 'insensitive' } }, { phone: { contains: query } }, { email: { contains: query, mode: 'insensitive' } }] } } : {})
+      ...(query ? { OR: [{ clientName: { contains: query, mode: 'insensitive' } }, { clientPhone: { contains: query } }] } : {})
     };
     return prisma.appointment.count({ where });
   }
@@ -30,24 +30,15 @@ export class AppointmentRepository {
   async findById(id: string) {
     return prisma.appointment.findUnique({
       where: { id },
-      include: { client: true, service: true, professional: true, notifications: true }
-    });
-  }
-
-  async findByDateRange(professionalId: string, startDate: Date, endDate: Date) {
-    return prisma.appointment.findMany({
-      where: { professionalId, date: { gte: startDate, lte: endDate }, status: { not: 'CANCELLED' } },
       include: { client: true, service: true }
     });
   }
 
-async findConflicting(professionalId: string, date: Date, startTime: string) {
-    // SELECT FOR UPDATE to prevent race conditions during booking
+  async findConflicting(date: Date, time: string) {
     const result = (await prisma.$queryRaw`
       SELECT id FROM appointments
-      WHERE "professionalId" = ${professionalId}
-      AND "date" = ${date}
-      AND "startTime" = ${startTime}
+      WHERE "date" = ${date}
+      AND "time" = ${time}
       AND status != 'CANCELLED'
       FOR UPDATE
     `) as any[];
@@ -59,28 +50,16 @@ async findConflicting(professionalId: string, date: Date, startTime: string) {
     return prisma.appointment.create({ data, include: { client: true, service: true } });
   }
 
-  async updateStatus(id: string, status: AppointmentStatus, extras?: { cancelReason?: string; timestamp?: Date }) {
-    const data: Prisma.AppointmentUpdateInput = { status };
-    if (status === 'CANCELLED') {
-      data.cancelReason = extras?.cancelReason;
-      data.cancelledAt = extras?.timestamp || new Date();
-    } else if (status === 'CONFIRMED') {
-      data.confirmedAt = extras?.timestamp || new Date();
-    } else if (status === 'COMPLETED') {
-      data.completedAt = extras?.timestamp || new Date();
-    }
-    return prisma.appointment.update({ where: { id }, data, include: { client: true } });
+  async updateStatus(id: string, status: AppointmentStatus) {
+    return prisma.appointment.update({ where: { id }, data: { status }, include: { client: true, service: true } });
   }
 
-  async reschedule(id: string, date: Date, startTime: string, endTime: string) {
+  async reschedule(id: string, date: Date, time: string) {
     return prisma.appointment.update({
       where: { id },
-      data: { date, startTime, endTime, status: 'PENDING', notifications: { deleteMany: { status: 'PENDING' } } }
+      data: { date, time, status: 'PENDING' },
+      include: { client: true, service: true }
     });
-  }
-
-  async countByStatus() {
-    return prisma.appointment.groupBy({ by: ['status'], _count: { id: true } });
   }
 
   async getDashboardStats() {
@@ -94,16 +73,15 @@ async findConflicting(professionalId: string, date: Date, startTime: string) {
     const weekEnd = new Date(weekStart);
     weekEnd.setDate(weekStart.getDate() + 7);
 
-    const [todayCount, weekCount, pendingCount, completedCount, cancelledCount, totalCount] = await Promise.all([
+    const [todayCount, weekCount, pendingCount, cancelledCount, totalCount] = await Promise.all([
       prisma.appointment.count({ where: { date: { gte: today, lt: tomorrow } } }),
       prisma.appointment.count({ where: { date: { gte: weekStart, lt: weekEnd } } }),
       prisma.appointment.count({ where: { status: 'PENDING' } }),
-      prisma.appointment.count({ where: { status: 'COMPLETED' } }),
       prisma.appointment.count({ where: { status: 'CANCELLED' } }),
       prisma.appointment.count()
     ]);
     
     const cancellationRate = totalCount > 0 ? (cancelledCount / totalCount) * 100 : 0;
-    return { todayCount, weekCount, pendingCount, completedCount, cancellationRate: Math.round(cancellationRate * 10) / 10 };
+    return { todayCount, weekCount, pendingCount, cancellationRate: Math.round(cancellationRate * 10) / 10 };
   }
 }

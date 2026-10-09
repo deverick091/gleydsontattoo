@@ -1,29 +1,44 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { randomBytes } from 'node:crypto';
 import { env } from '../../config/env.js';
 import { UserRepository } from '../../repositories/users/user.repository.js';
 import { UnauthorizedError, NotFoundError } from '../../helpers/errors.js';
-import prisma from '../../config/database.js';
+import { supabasePublic } from '../../config/supabase.js';
 
 const userRepository = new UserRepository();
 
 export class AuthService {
   async login(email: string, passwordString: string) {
-    const user = await userRepository.findByEmail(email);
-    if (!user || !user.isActive) throw new UnauthorizedError('Credenciais inválidas ou usuário inativo');
+    const normalizedEmail = email.trim().toLowerCase();
+    const { data, error } = await supabasePublic.auth.signInWithPassword({
+      email: normalizedEmail,
+      password: passwordString,
+    });
 
-    const fullUser = await prisma.user.findUnique({ where: { id: user.id } });
-    if (!fullUser) throw new UnauthorizedError('Credenciais inválidas');
+    if (error || !data.user || !data.session) {
+      throw new UnauthorizedError('Credenciais inválidas');
+    }
 
-    const isValid = await bcrypt.compare(passwordString, fullUser.password);
-    if (!isValid) throw new UnauthorizedError('Credenciais inválidas');
+    const authenticatedEmail = data.user.email?.trim().toLowerCase();
+    if (!authenticatedEmail) throw new UnauthorizedError('A conta Supabase não possui email');
 
-    const token = jwt.sign(
-      { id: user.id, email: user.email, role: user.role },
-      env.JWT_SECRET,
-      { expiresIn: env.JWT_EXPIRES_IN } as any
-    );
-    return { user, token };
+    let user = await userRepository.findByEmail(authenticatedEmail);
+    if (!user && authenticatedEmail === env.ADMIN_EMAIL.trim().toLowerCase()) {
+      user = await userRepository.create({
+        email: authenticatedEmail,
+        password: await bcrypt.hash(randomBytes(32).toString('hex'), 12),
+        name: data.user.user_metadata?.full_name || authenticatedEmail.split('@')[0],
+        role: 'ADMIN',
+        isActive: true,
+      });
+    }
+
+    if (!user || !user.isActive) {
+      throw new UnauthorizedError('Usuário sem perfil ativo no sistema');
+    }
+
+    return { user, token: data.session.access_token };
   }
 
   async me(userId: string) {
@@ -35,7 +50,6 @@ export class AuthService {
   async generateMagicLink(email: string) {
     const user = await userRepository.findByEmail(email);
     if (!user) return null;
-    const token = jwt.sign({ id: user.id, type: 'magic_link' }, env.JWT_SECRET, { expiresIn: '1h' });
-    return token;
+    return jwt.sign({ id: user.id, type: 'magic_link' }, env.JWT_SECRET, { expiresIn: '1h' });
   }
 }
