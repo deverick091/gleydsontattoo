@@ -60,3 +60,7 @@ backend/prisma/*.db-journal
 *.tsbuildinfo
 .turbo/
 
+
+.claude/
+.mcp.json
+*.backup
