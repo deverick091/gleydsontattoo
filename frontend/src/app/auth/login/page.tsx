@@ -52,7 +52,7 @@ export default function LoginPage() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <label htmlFor="email" className="text-sm font-medium text-white">Email</label>
-                <Input id="email" name="email" type="email" autoComplete="username" placeholder="admin@gleydsontattoo.com" required className="h-12" />
+                <Input id="email" name="email" type="email" autoComplete="username" required className="h-12" />
               </div>
               <div className="space-y-2">
                 <label htmlFor="password" className="text-sm font-medium text-white">Senha</label>
