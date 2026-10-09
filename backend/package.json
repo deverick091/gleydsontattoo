@@ -2,14 +2,14 @@
   "name": "gleydsontattoo-backend",
   "version": "1.0.0",
   "description": "Backend for Gleydsontattoo studio management system",
-  "main": "dist/server.js",
+  "main": "dist/src/server.js",
   "prisma": {
     "seed": "tsx prisma/seed.ts"
   },
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
-    "start": "node dist/server.js",
+    "start": "node dist/src/server.js",
     "test": "vitest run",
     "seed": "tsx prisma/seed.ts",
     "migrate": "prisma migrate dev",
