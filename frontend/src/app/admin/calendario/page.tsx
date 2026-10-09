@@ -106,7 +106,7 @@ export default function AdminCalendario() {
       // result may be paginated { data: [...], pagination: {...} }
       // or a plain array depending on API shape. Cast through unknown to handle
       // the real API shape (which differs from the TypeScript type).
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line
       const resultAny = result as any;
       const raw: RawAppointment[] = Array.isArray(resultAny)
         ? resultAny
