@@ -31,3 +31,8 @@ prisma/migrations/**/migration_lock.toml
 
 # Uploads
 uploads/
+
+.env
+.env*.local
+.env.production
+.env.development
