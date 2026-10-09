@@ -77,6 +77,7 @@ export class AppointmentController {
     try {
       const data = {
         ...req.body,
+        time: req.body.time || req.body.startTime,
         date:   parseDate(req.body.date),
         client: { ...req.body.client, referenceImages: req.body.referenceImages },
       };
