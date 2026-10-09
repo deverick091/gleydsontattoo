@@ -35,15 +35,13 @@ export class AppointmentRepository {
   }
 
   async findConflicting(date: Date, time: string) {
-    const result = (await prisma.$queryRaw`
-      SELECT id FROM appointments
-      WHERE "date" = ${date}
-      AND "time" = ${time}
-      AND status != 'CANCELLED'
-      FOR UPDATE
-    `) as any[];
-
-    return result.length > 0 ? result[0] : null;
+    return prisma.appointment.findFirst({
+      where: {
+        date,
+        time,
+        status: { not: 'CANCELLED' }
+      }
+    });
   }
   
   async create(data: Prisma.AppointmentUncheckedCreateInput) {
