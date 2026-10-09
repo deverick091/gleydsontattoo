@@ -28,11 +28,14 @@ const menuItems = [
   { icon: ClipboardList, label: "Logs", href: "/admin/logs" },
 ];
 
-export default function AdminSidebar() {
+export default function AdminSidebar({ className }: { className?: string }) {
   const pathname = usePathname();
 
   return (
-    <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-border bg-black transition-transform">
+    <aside className={cn(
+      "fixed left-0 top-0 z-50 h-screen w-64 border-r border-border bg-black transition-transform duration-300 ease-in-out",
+      className
+    )}>
       <div className="flex h-16 items-center border-b border-border px-6">
         <span className="text-xl font-bold tracking-wider">
           <span className="text-accent">GLEYDSON</span>

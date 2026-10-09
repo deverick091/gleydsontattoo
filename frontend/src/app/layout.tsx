@@ -9,6 +9,7 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 export const metadata: Metadata = {
   title: "Gleydson Tattoo | Estúdio de Tatuagem Premium",
   description: "Estúdio de tatuagem premium em São Paulo. Especialistas em Realismo, Blackwork e Fine Line.",
+  manifest: "/manifest.json",
 };
 
 export default function RootLayout({

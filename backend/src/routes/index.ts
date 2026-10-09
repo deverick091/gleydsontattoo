@@ -6,6 +6,7 @@ import serviceRoutes from './service.routes';
 import portfolioRoutes from './portfolio.routes';
 import budgetRoutes from './budget.routes';
 import userRoutes from './user.routes';
+import dashboardRoutes from './dashboard.routes';
 
 import { authenticate } from '../middleware/auth';
 import { authorize } from '../middleware/rbac';
@@ -21,5 +22,6 @@ router.use('/services', serviceRoutes);
 router.use('/portfolio', portfolioRoutes);
 router.use('/budgets', budgetRoutes);
 router.use('/users', userRoutes);
+router.use('/dashboard', dashboardRoutes);
 
 export default router;

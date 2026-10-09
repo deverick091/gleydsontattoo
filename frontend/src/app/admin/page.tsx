@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, CalendarCheck, TrendingUp, Clock } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { adminAppointmentService, AdminAppointment } from "@/services/admin.service";
+import { adminAppointmentService, adminDashboardService, AdminAppointment } from "@/services/admin.service";
 import { AppointmentStatus } from "@/types";
 
 interface DashboardStats {
@@ -29,39 +29,8 @@ export default function AdminDashboard() {
   useEffect(() => {
     async function loadDashboard() {
       try {
-        // Load all appointments with a broad range
-        const result = await adminAppointmentService.list({ limit: "200" });
-        const all = result.data;
-
-        const today = new Date();
-        const todayStr = toLocalDateStr(today);
-
-        // Today's appointments
-        const todayAppointments = all.filter(a => a.date === todayStr || a.date?.startsWith(todayStr));
-
-        // Status counts
-        const pendingCount = all.filter(a => a.status === AppointmentStatus.PENDING).length;
-        const confirmedCount = all.filter(a => a.status === AppointmentStatus.CONFIRMED).length;
-        const completedCount = all.filter(a => a.status === AppointmentStatus.COMPLETED).length;
-
-        // Build last 7 days chart data
-        const weekData = [];
-        for (let i = 6; i >= 0; i--) {
-          const d = new Date();
-          d.setDate(d.getDate() - i);
-          const dStr = toLocalDateStr(d);
-          const count = all.filter(a => a.date === dStr || a.date?.startsWith(dStr)).length;
-          weekData.push({ name: DAY_NAMES[d.getDay()], Agendamentos: count });
-        }
-
-        setStats({
-          todayCount: todayAppointments.length,
-          pendingCount,
-          confirmedCount,
-          completedCount,
-          todayAppointments: todayAppointments.sort((a, b) => a.startTime.localeCompare(b.startTime)),
-          weekData,
-        });
+        const result = await adminDashboardService.getStats();
+        setStats(result.data);
       } catch (e) {
         console.error('Erro ao carregar dashboard:', e);
       } finally {

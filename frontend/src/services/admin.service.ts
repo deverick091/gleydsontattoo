@@ -93,3 +93,9 @@ export const adminCatalogService = {
   getProfessionals: () => api.get<ApiResponse<BookingProfessional[]>>('/api/professionals'),
   getServices: () => api.get<ApiResponse<BookingService[]>>('/api/services'),
 };
+
+export const adminDashboardService = {
+  async getStats() {
+    return api.get<any>('/api/dashboard/stats');
+  }
+};
