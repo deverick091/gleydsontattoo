@@ -12,6 +12,7 @@ router.post('/', controller.create.bind(controller));
 router.get('/:id', ...admin, controller.getById.bind(controller));
 router.patch('/:id/respond', ...admin, controller.respond.bind(controller));
 router.patch('/:id/status', ...admin, controller.updateStatus.bind(controller));
+router.patch('/:id', ...admin, controller.updateStatus.bind(controller));
 router.post('/:id/convert', ...admin, controller.convert.bind(controller));
 
 export default router;

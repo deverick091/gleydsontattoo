@@ -82,24 +82,37 @@ export default function BookingStepper() {
     try {
       setIsSubmitting(true);
 
-      await bookingService.createAppointment({
-        professionalId: bookingData.professionalId,
-        serviceId: bookingData.serviceId,
-        date: bookingData.selectedDate,
-        startTime: bookingData.selectedTime,
-        client: {
-          name: bookingData.clientName,
-          phone: bookingData.clientPhone,
-          whatsapp: bookingData.clientPhone,
-          email: bookingData.clientEmail,
-          notes: bookingData.notes,
-        },
-      });
+      if (bookingData.isBudget) {
+        await bookingService.createBudget({
+          clientName: bookingData.clientName,
+          clientPhone: bookingData.clientPhone,
+          clientEmail: bookingData.clientEmail,
+          serviceId: bookingData.serviceId,
+          description: `Serviço: ${bookingData.serviceName} (Sob Orçamento)\nData pretendida: ${bookingData.selectedDate} às ${bookingData.selectedTime}\n${bookingData.notes ? `Observações: ${bookingData.notes}` : ''}`.trim(),
+        });
 
-      toast.success("Agendamento confirmado com sucesso!");
+        toast.success("Solicitação de orçamento enviada com sucesso!");
+      } else {
+        await bookingService.createAppointment({
+          professionalId: bookingData.professionalId,
+          serviceId: bookingData.serviceId,
+          date: bookingData.selectedDate,
+          startTime: bookingData.selectedTime,
+          client: {
+            name: bookingData.clientName,
+            phone: bookingData.clientPhone,
+            whatsapp: bookingData.clientPhone,
+            email: bookingData.clientEmail,
+            notes: bookingData.notes,
+          },
+        });
+
+        toast.success("Agendamento confirmado com sucesso!");
+      }
+
       handleNext();
     } catch (error) {
-      const message = error instanceof ApiError ? error.message : "Erro ao confirmar agendamento";
+      const message = error instanceof ApiError ? error.message : "Erro ao processar solicitação";
       toast.error(message);
     } finally {
       setIsSubmitting(false);

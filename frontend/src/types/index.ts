@@ -221,6 +221,8 @@ export interface BookingData {
   clientPhone: string;
   clientEmail: string;
   notes?: string;
+  isBudget?: boolean;
+  price?: number | null;
 }
 
 export interface StepComponentProps {

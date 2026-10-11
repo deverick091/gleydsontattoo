@@ -42,12 +42,27 @@ export default function StepSummary({ data, onEdit, onConfirm, isSubmitting = fa
 
   return (
     <div className="space-y-8">
-      <h2 className="text-2xl font-bold text-white mb-6">Resumo do Agendamento</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold text-white">
+          {data.isBudget ? "Resumo da Solicitação de Orçamento" : "Resumo do Agendamento"}
+        </h2>
+        {data.isBudget && (
+          <span className="px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+            Sob Orçamento
+          </span>
+        )}
+      </div>
+
+      {data.isBudget && (
+        <div className="p-4 rounded-xl border border-amber-500/20 bg-amber-500/5 text-amber-300 text-sm">
+          💡 Este serviço é <strong>sob orçamento</strong>. Seus dados e preferências de horário serão enviados diretamente para nossa equipe analisar e entrar em contato com o valor do projeto via WhatsApp.
+        </div>
+      )}
 
       <div className="bg-zinc-950 border border-zinc-800 rounded-xl p-6">
         <Section title="Serviço" content={data.serviceName} step={0} onEdit={onEdit} />
-        <Section title="Data" content={dateFormatted} step={1} onEdit={onEdit} />
-        <Section title="Horário" content={data.selectedTime} step={2} onEdit={onEdit} />
+        <Section title="Data Pretendida" content={dateFormatted} step={1} onEdit={onEdit} />
+        <Section title="Horário Pretendido" content={data.selectedTime} step={2} onEdit={onEdit} />
 
         <div className="flex justify-between items-start py-4">
           <div>
@@ -55,6 +70,7 @@ export default function StepSummary({ data, onEdit, onConfirm, isSubmitting = fa
             <p className="text-white font-medium">{data.clientName}</p>
             <p className="text-zinc-400 text-sm mt-1">{data.clientPhone}</p>
             <p className="text-zinc-400 text-sm mt-1">{data.clientEmail}</p>
+            {data.notes && <p className="text-zinc-400 text-sm mt-2 italic">Obs: {data.notes}</p>}
           </div>
           <button
             onClick={() => onEdit(3)}
@@ -69,6 +85,7 @@ export default function StepSummary({ data, onEdit, onConfirm, isSubmitting = fa
         <input
           type="checkbox"
           id="terms"
+          defaultChecked
           className="w-5 h-5 rounded border-zinc-700 bg-zinc-900 text-accent focus:ring-accent accent-accent"
         />
         <label htmlFor="terms" className="text-sm text-muted">
@@ -77,7 +94,11 @@ export default function StepSummary({ data, onEdit, onConfirm, isSubmitting = fa
       </div>
 
       <Button size="lg" className="w-full h-14 text-lg" onClick={onConfirm} disabled={isSubmitting}>
-        {isSubmitting ? "Confirmando..." : "Confirmar Agendamento"}
+        {isSubmitting
+          ? "Enviando..."
+          : data.isBudget
+          ? "Solicitar Orçamento"
+          : "Confirmar Agendamento"}
       </Button>
     </div>
   );

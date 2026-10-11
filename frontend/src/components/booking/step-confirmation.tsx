@@ -18,7 +18,9 @@ export default function StepConfirmation({ data }: StepConfirmationProps) {
     : "";
 
   const textToShare = encodeURIComponent(
-    `Olá! Meu agendamento está confirmado:\n\nServiço: ${data.serviceName}\nProfissional: ${data.professionalName}\nData: ${dateFormatted} às ${data.selectedTime}\n\nObrigado!`
+    data.isBudget
+      ? `Olá! Enviei uma solicitação de orçamento no site para o serviço: ${data.serviceName}.\nNome: ${data.clientName}\nData preferida: ${dateFormatted} às ${data.selectedTime}\n\nGostaria de mais informações!`
+      : `Olá! Meu agendamento está confirmado:\n\nServiço: ${data.serviceName}\nProfissional: ${data.professionalName}\nData: ${dateFormatted} às ${data.selectedTime}\n\nObrigado!`
   );
 
   const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "5591999999999";
@@ -40,7 +42,7 @@ export default function StepConfirmation({ data }: StepConfirmationProps) {
           transition={{ delay: 0.2 }}
           className="text-3xl font-bold text-accent mb-3"
         >
-          Agendamento Realizado!
+          {data.isBudget ? "Orçamento Solicitado!" : "Agendamento Realizado!"}
         </motion.h2>
         <motion.p
           initial={{ opacity: 0, y: 20 }}
@@ -48,8 +50,9 @@ export default function StepConfirmation({ data }: StepConfirmationProps) {
           transition={{ delay: 0.3 }}
           className="text-muted text-lg max-w-md mx-auto"
         >
-          Olá {data.clientName}, recebemos seu pedido de agendamento.
-          Te enviaremos uma mensagem no WhatsApp em breve.
+          {data.isBudget
+            ? `Olá ${data.clientName}, recebemos seu pedido de orçamento para ${data.serviceName}. Nossa equipe entrará em contato via WhatsApp para passar os detalhes e o valor.`
+            : `Olá ${data.clientName}, recebemos seu pedido de agendamento. Te enviaremos uma mensagem no WhatsApp em breve.`}
         </motion.p>
       </div>
 

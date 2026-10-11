@@ -9,7 +9,8 @@ export class BudgetController {
   async list(req: Request, res: Response) {
     try {
       const { status } = req.query;
-      const data = await service.list(status as BudgetStatus);
+      const budgetStatus = status && status !== 'todos' ? (status as BudgetStatus) : undefined;
+      const data = await service.list(budgetStatus);
       return sendSuccess(res, data);
     } catch (e: any) {
       res.status(500).json({ success: false, error: { message: e.message } });
@@ -39,7 +40,8 @@ export class BudgetController {
 
   async respond(req: Request, res: Response) {
     try {
-      const data = await service.respond(req.params.id, req.body);
+      const responseText = req.body.response || req.body.adminResponse || '';
+      const data = await service.respond(req.params.id, responseText);
       return sendSuccess(res, data);
     } catch (e: any) {
       res.status(500).json({ success: false, error: { message: e.message } });

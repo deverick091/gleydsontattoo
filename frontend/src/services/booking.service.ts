@@ -81,4 +81,14 @@ export const bookingService = {
   createAppointment(data: CreateAppointmentInput) {
     return api.post<ApiResponse<unknown>>("/api/appointments", data);
   },
+
+  createBudget(data: {
+    clientName: string;
+    clientPhone: string;
+    clientEmail?: string;
+    description?: string;
+    serviceId?: string;
+  }) {
+    return api.post<ApiResponse<unknown>>("/api/budgets", data);
+  },
 };

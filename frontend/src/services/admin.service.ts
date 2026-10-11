@@ -82,11 +82,15 @@ export const adminPortfolioService = {
 };
 
 export const adminBudgetService = {
-  async list(params: Record<string, string> = {}) { return api.get<Paginated<AdminBudget>>('/api/budgets', params); },
+  async list(params: Record<string, string> = {}) {
+    const res = await api.get<any>('/api/budgets', params);
+    const data = res?.data !== undefined ? res.data : res;
+    return { data: Array.isArray(data) ? data : [] };
+  },
   async get(id: string) { return unwrap(await api.get<ApiResponse<AdminBudget>>(`/api/budgets/${id}`)); },
   async respond(id: string, response: string) { return unwrap(await api.patch<ApiResponse<AdminBudget>>(`/api/budgets/${id}/respond`, { response })); },
   async updateStatus(id: string, status: BudgetStatus) { return unwrap(await api.patch<ApiResponse<AdminBudget>>(`/api/budgets/${id}/status`, { status })); },
-  async convert(id: string, data: { professionalId: string; serviceId: string; date: string; startTime: string; endTime: string }) { return unwrap(await api.post<ApiResponse<AdminBudget>>(`/api/budgets/${id}/convert`, data)); },
+  async convert(id: string, data?: { professionalId?: string; serviceId?: string; date?: string; startTime?: string; endTime?: string }) { return unwrap(await api.post<ApiResponse<AdminBudget>>(`/api/budgets/${id}/convert`, data || {})); },
 };
 
 export const adminCatalogService = {

@@ -33,6 +33,7 @@ interface ServiceForm {
   description: string;
   duration: string;
   price: string;
+  isBudget: boolean;
   active: boolean;
 }
 
@@ -41,6 +42,7 @@ const emptyForm: ServiceForm = {
   description: "",
   duration: "60",
   price: "",
+  isBudget: false,
   active: true,
 };
 
@@ -95,6 +97,7 @@ export default function AdminServicos() {
       description: service.description ?? "",
       duration: String(service.duration),
       price: service.price != null ? String(service.price) : "",
+      isBudget: service.price == null || service.price === 0,
       active: service.active,
     });
     setModalOpen(true);
@@ -113,7 +116,7 @@ export default function AdminServicos() {
       name: form.name.trim(),
       description: form.description.trim() || null,
       duration,
-      price: form.price !== "" ? parseFloat(form.price) : null,
+      price: form.isBudget || form.price === "" ? null : parseFloat(form.price),
       active: form.active,
     };
 
@@ -147,7 +150,13 @@ export default function AdminServicos() {
   }
 
   function formatPrice(price?: number | null) {
-    if (price == null) return "Sob orçamento";
+    if (price == null || price === 0) {
+      return (
+        <span className="px-2 py-0.5 rounded text-xs bg-amber-500/10 text-amber-400 border border-amber-500/20 font-semibold inline-block">
+          Sob Orçamento
+        </span>
+      );
+    }
     return price.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
   }
 
@@ -252,12 +261,28 @@ export default function AdminServicos() {
                   type="number"
                   min="0"
                   step="0.01"
-                  value={form.price}
+                  disabled={form.isBudget}
+                  value={form.isBudget ? "" : form.price}
                   onChange={e => updateForm("price", e.target.value)}
-                  placeholder="Deixe vazio p/ orçamento"
+                  placeholder={form.isBudget ? "Sob orçamento" : "Deixe vazio p/ orçamento"}
                 />
               </div>
             </div>
+
+            <div className="flex items-center justify-between p-3 rounded-lg border border-zinc-800 bg-zinc-950/60">
+              <div>
+                <p className="text-sm font-medium text-zinc-200">Serviço Sob Orçamento</p>
+                <p className="text-xs text-zinc-400">Sem valor fixo. As solicitações cairão na aba Orçamentos.</p>
+              </div>
+              <Switch
+                checked={form.isBudget}
+                onCheckedChange={v => {
+                  updateForm("isBudget", v);
+                  if (v) updateForm("price", "");
+                }}
+              />
+            </div>
+
             <div className="flex items-center gap-3">
               <Switch
                 checked={form.active}

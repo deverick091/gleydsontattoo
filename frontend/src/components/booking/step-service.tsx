@@ -18,10 +18,10 @@ function formatDuration(duration: number) {
 }
 
 function formatPrice(service: BookingService) {
-  if (service.priceType === "CONSULTATION") return "Sob consulta";
+  if (service.priceType === "CONSULTATION") return "Sob orçamento";
 
-  const price = service.priceMin ?? service.priceMax;
-  if (price === null || price === undefined) return "Sob consulta";
+  const price = (service as any).price ?? service.priceMin ?? service.priceMax;
+  if (price === null || price === undefined || price === 0) return "Sob orçamento";
 
   const formatted = new Intl.NumberFormat("pt-BR", {
     style: "currency",
@@ -92,7 +92,14 @@ export default function StepService({ data, updateData, onNext }: StepComponentP
                 key={service.id}
                 type="button"
                 onClick={() => {
-                  updateData({ serviceId: service.id, serviceName: service.name });
+                  const rawPrice = (service as any).price ?? service.priceMin ?? service.priceMax;
+                  const isBudget = rawPrice === null || rawPrice === undefined || rawPrice === 0 || service.priceType === "CONSULTATION";
+                  updateData({
+                    serviceId: service.id,
+                    serviceName: service.name,
+                    isBudget,
+                    price: rawPrice ? Number(rawPrice) : null,
+                  });
                   window.setTimeout(onNext, 300);
                 }}
                 className={`relative rounded-xl border-2 p-6 text-left transition-all ${
