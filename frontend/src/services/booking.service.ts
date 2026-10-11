@@ -65,14 +65,18 @@ export const bookingService = {
         );
         return !hasAppointment && !isBlocked;
       });
-    } catch (error) {
-      // Se não existir o endpoint na API, retorna horários genéricos
+    } catch {
+      // Carrega os horários configurados pelo admin
+      const hoursSetting = await this.getBusinessHours();
+      const start = hoursSetting.workStartHour ?? 9;
+      const end = hoursSetting.workEndHour ?? 19;
+
       const defaultSlots: BookingTimeSlot[] = [];
-      for (let h = 9; h <= 18; h++) {
+      for (let h = start; h < end; h++) {
         const hour = h.toString().padStart(2, '0');
         const nextHour = (h + 1).toString().padStart(2, '0');
         defaultSlots.push({ startTime: `${hour}:00`, endTime: `${hour}:30` });
-        if (h !== 18) defaultSlots.push({ startTime: `${hour}:30`, endTime: `${nextHour}:00` });
+        defaultSlots.push({ startTime: `${hour}:30`, endTime: `${nextHour}:00` });
       }
       return defaultSlots;
     }
@@ -90,5 +94,19 @@ export const bookingService = {
     serviceId?: string;
   }) {
     return api.post<ApiResponse<unknown>>("/api/budgets", data);
+  },
+
+  async getBusinessHours() {
+    try {
+      const res = await api.get<any>("/api/settings/business-hours");
+      return res.data || res;
+    } catch {
+      return {
+        openDays: [1, 2, 3, 4, 5, 6],
+        closedDates: [],
+        workStartHour: 9,
+        workEndHour: 19,
+      };
+    }
   },
 };

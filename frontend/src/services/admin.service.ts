@@ -103,3 +103,37 @@ export const adminDashboardService = {
     return api.get<any>('/api/dashboard/stats');
   }
 };
+
+export interface BusinessHoursSetting {
+  openDays: number[]; // 0: Dom, 1: Seg, 2: Ter, 3: Qua, 4: Qui, 5: Sex, 6: Sáb
+  closedDates?: string[];
+  workStartHour?: number;
+  workEndHour?: number;
+  slotDurationMinutes?: number;
+}
+
+export interface StudioInfoSetting {
+  name: string;
+  phone: string;
+  address: string;
+  cancellationPolicy: string;
+}
+
+export const adminSettingsService = {
+  async getBusinessHours() {
+    const res = await api.get<any>('/api/settings/business-hours');
+    return res.data || res;
+  },
+  async updateBusinessHours(data: BusinessHoursSetting) {
+    const res = await api.put<any>('/api/settings/business-hours', data);
+    return res.data || res;
+  },
+  async getStudioInfo() {
+    const res = await api.get<any>('/api/settings/studio-info');
+    return res.data || res;
+  },
+  async updateStudioInfo(data: StudioInfoSetting) {
+    const res = await api.put<any>('/api/settings/studio-info', data);
+    return res.data || res;
+  },
+};
