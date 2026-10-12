@@ -56,6 +56,7 @@ export class AppointmentController {
         dateTo:         parseDateEnd(req.query.endDate),
         professionalId: req.query.professionalId as string | undefined,
         query:          req.query.query as string | undefined,
+        order:          (req.query.order as 'asc' | 'desc') || undefined,
       };
       const result = await service.list(filters, page, limit);
       return sendPaginated(res, result.data.map(mapAppointment), page, limit, result.total);

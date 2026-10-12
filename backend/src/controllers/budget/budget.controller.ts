@@ -59,8 +59,8 @@ export class BudgetController {
 
   async convert(req: Request, res: Response) {
     try {
-      const data = await service.convert(req.params.id);
-      return sendSuccess(res, data);
+      const data = await service.convert(req.params.id, req.body);
+      return sendSuccess(res, data, 'Orçamento aprovado e agendado com sucesso');
     } catch (e: any) {
       res.status(500).json({ success: false, error: { message: e.message } });
     }

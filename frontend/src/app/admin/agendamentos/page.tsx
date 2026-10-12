@@ -12,7 +12,8 @@ import { AppointmentStatus } from "@/types";
 import type { BookingService as BookingServiceType } from "@/types";
 import { CalendarPlus, Edit, RefreshCw } from "lucide-react";
 import toast from "react-hot-toast";
-import { adminAppointmentService, AdminAppointment } from "@/services/admin.service";
+import Link from "next/link";
+import { adminAppointmentService, adminBudgetService, AdminAppointment } from "@/services/admin.service";
 import { bookingService } from "@/services/booking.service";
 
 interface NewAppointmentForm {
@@ -68,6 +69,7 @@ export default function AdminAgendamentos() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [mutating, setMutating] = useState<string | null>(null);
+  const [pendingBudgetsCount, setPendingBudgetsCount] = useState(0);
 
   // New appointment modal state
   const [modalOpen, setModalOpen] = useState(false);
@@ -82,8 +84,12 @@ export default function AdminAgendamentos() {
       if (query.trim()) params.query = query.trim();
       if (status !== "todos") params.status = status;
       if (date && date.length === 10) params.date = brToIso(date);
-      const result = await adminAppointmentService.list(params);
+      const [result, budgetsRes] = await Promise.all([
+        adminAppointmentService.list(params),
+        adminBudgetService.list({ status: "PENDING" }).catch(() => ({ data: [] })),
+      ]);
       setItems(result.data);
+      setPendingBudgetsCount(budgetsRes.data?.length || 0);
     } catch (e) { setError(e instanceof Error ? e.message : "Não foi possível carregar os agendamentos."); }
     finally { setLoading(false); }
   }, [query, status, date]);
@@ -161,6 +167,27 @@ export default function AdminAgendamentos() {
           <Button onClick={load}><RefreshCw className="mr-2 h-4 w-4" />Atualizar</Button>
         </div>
       </div>
+
+      {pendingBudgetsCount > 0 && (
+        <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">💡</span>
+            <div>
+              <p className="text-amber-200 font-medium text-sm sm:text-base">
+                Você tem {pendingBudgetsCount} solicitação{pendingBudgetsCount > 1 ? 'ões' : ''} de orçamento aguardando análise!
+              </p>
+              <p className="text-xs text-amber-400/80">
+                Orçamentos aprovados criam automaticamente o agendamento no Calendário e nesta lista.
+              </p>
+            </div>
+          </div>
+          <Link href="/admin/orcamentos">
+            <Button size="sm" className="bg-amber-500 text-black hover:bg-amber-400 font-medium whitespace-nowrap">
+              Ver Orçamentos
+            </Button>
+          </Link>
+        </div>
+      )}
       <Card className="p-4 bg-zinc-900 border-zinc-800 flex flex-col md:flex-row gap-4">
         <Input value={query} onChange={e => setQuery(e.target.value)} placeholder="Buscar por cliente..." className="md:w-1/3" />
         <Select value={status} onValueChange={setStatus}><SelectTrigger className="w-full md:w-[200px]"><SelectValue placeholder="Status" /></SelectTrigger><SelectContent>

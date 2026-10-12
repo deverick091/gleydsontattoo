@@ -1,7 +1,8 @@
 "use client";
 
-import { Bell, User, LogOut, Menu, X } from "lucide-react";
+import { User, LogOut, Menu } from "lucide-react";
 import AdminSidebar from "./admin-sidebar";
+import NotificationBell from "./notification-bell";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -58,12 +59,7 @@ export default function AdminLayoutComponent({ children }: { children: React.Rea
           
 
           <div className="flex items-center gap-4 md:gap-6">
-            <button className="relative text-muted hover:text-white transition-colors">
-              <Bell className="h-5 w-5" />
-              <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-accent text-[10px] font-bold text-black">
-                3
-              </span>
-            </button>
+            <NotificationBell />
             
 
             <DropdownMenu>

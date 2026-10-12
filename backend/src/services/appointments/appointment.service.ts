@@ -60,7 +60,7 @@ export class AppointmentService {
     });
   }
 
-  async list(filters: { status?: AppointmentStatus; date?: Date; dateFrom?: Date; dateTo?: Date; query?: string }, page: number, limit: number) {
+  async list(filters: { status?: AppointmentStatus; date?: Date; dateFrom?: Date; dateTo?: Date; query?: string; order?: 'asc' | 'desc' }, page: number, limit: number) {
     const [data, total] = await Promise.all([
       appointmentRepo.findAll(filters, (page - 1) * limit, limit),
       appointmentRepo.count(filters)

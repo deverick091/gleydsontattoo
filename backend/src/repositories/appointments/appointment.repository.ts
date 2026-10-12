@@ -2,18 +2,19 @@ import prisma from '../../config/database';
 import { AppointmentStatus, Prisma } from '@prisma/client';
 
 export class AppointmentRepository {
-  async findAll(filters: { status?: AppointmentStatus; date?: Date; dateFrom?: Date; dateTo?: Date; query?: string }, skip: number, take: number) {
-    const { date, dateFrom, dateTo, query, ...rest } = filters;
+  async findAll(filters: { status?: AppointmentStatus; date?: Date; dateFrom?: Date; dateTo?: Date; query?: string; order?: 'asc' | 'desc' }, skip: number, take: number) {
+    const { date, dateFrom, dateTo, query, order, ...rest } = filters;
     const where: Prisma.AppointmentWhereInput = {
       ...rest,
       ...(date ? { date } : dateFrom || dateTo ? { date: { ...(dateFrom ? { gte: dateFrom } : {}), ...(dateTo ? { lte: dateTo } : {}) } } : {}),
       ...(query ? { OR: [{ clientName: { contains: query, mode: 'insensitive' } }, { clientPhone: { contains: query } }] } : {})
     };
+    const sortOrder = order || (dateFrom || dateTo ? 'asc' : 'desc');
     return prisma.appointment.findMany({
       where,
       skip, take,
       include: { client: true, service: true },
-      orderBy: [{ date: 'asc' }, { time: 'asc' }]
+      orderBy: [{ date: sortOrder }, { time: sortOrder }]
     });
   }
 

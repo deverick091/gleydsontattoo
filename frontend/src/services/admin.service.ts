@@ -104,6 +104,34 @@ export const adminDashboardService = {
   }
 };
 
+export interface AdminNotification {
+  id: string;
+  type: 'budget' | 'appointment' | 'today';
+  title: string;
+  description: string;
+  detail?: string | null;
+  date: string;
+  link: string;
+  isPending: boolean;
+}
+
+export interface NotificationsResponse {
+  unreadCount: number;
+  counts: {
+    pendingBudgets: number;
+    pendingAppointments: number;
+    todayAppointments: number;
+  };
+  notifications: AdminNotification[];
+}
+
+export const adminNotificationService = {
+  async getNotifications() {
+    const res = await api.get<ApiResponse<NotificationsResponse>>('/api/dashboard/notifications');
+    return res.data;
+  }
+};
+
 export interface BusinessHoursSetting {
   openDays: number[]; // 0: Dom, 1: Seg, 2: Ter, 3: Qua, 4: Qui, 5: Sex, 6: Sáb
   closedDates?: string[];

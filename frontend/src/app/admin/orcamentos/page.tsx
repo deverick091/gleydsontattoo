@@ -78,8 +78,13 @@ export default function AdminOrcamentos() {
 
   async function updateStatus(item: AdminBudget, newStatus: BudgetStatus) {
     try {
-      await adminBudgetService.updateStatus(item.id, newStatus);
-      toast.success(newStatus === BudgetStatus.CONVERTED ? "Orçamento aprovado/convertido!" : "Orçamento atualizado.");
+      if (newStatus === BudgetStatus.CONVERTED) {
+        await adminBudgetService.convert(item.id);
+        toast.success("Orçamento aprovado e agendado com sucesso no Calendário!");
+      } else {
+        await adminBudgetService.updateStatus(item.id, newStatus);
+        toast.success("Status atualizado com sucesso.");
+      }
       await load();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Não foi possível atualizar o status.");
@@ -217,14 +222,18 @@ export default function AdminOrcamentos() {
                   </div>
 
                   <div className="flex flex-wrap gap-2">
-                    {item.status !== BudgetStatus.CONVERTED && (
+                    {item.status === BudgetStatus.CONVERTED ? (
+                      <span className="text-xs text-emerald-400 bg-emerald-950/40 border border-emerald-800 rounded-lg px-2.5 py-1.5 flex items-center gap-1 font-medium">
+                        <CheckCircle className="h-3.5 w-3.5" /> Agendado no Calendário
+                      </span>
+                    ) : (
                       <Button
                         size="sm"
                         variant="secondary"
                         className="bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600/30 border border-emerald-600/30"
                         onClick={() => updateStatus(item, BudgetStatus.CONVERTED)}
                       >
-                        <CheckCircle className="mr-1.5 h-4 w-4" /> Aprovar / Converter
+                        <CheckCircle className="mr-1.5 h-4 w-4" /> Aprovar e Agendar
                       </Button>
                     )}
                     {item.status !== BudgetStatus.REJECTED && (
