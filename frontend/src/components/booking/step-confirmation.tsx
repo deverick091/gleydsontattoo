@@ -7,6 +7,7 @@ import Link from "next/link";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { BookingData } from "@/types";
+import { parseLocalDate } from "@/lib/utils";
 
 interface StepConfirmationProps {
   data: BookingData;
@@ -14,7 +15,7 @@ interface StepConfirmationProps {
 
 export default function StepConfirmation({ data }: StepConfirmationProps) {
   const dateFormatted = data.selectedDate
-    ? format(new Date(data.selectedDate), "dd/MM/yyyy", { locale: ptBR })
+    ? format(parseLocalDate(data.selectedDate), "dd/MM/yyyy", { locale: ptBR })
     : "";
 
   const textToShare = encodeURIComponent(

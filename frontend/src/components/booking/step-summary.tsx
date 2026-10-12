@@ -5,6 +5,7 @@ import { ptBR } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
 import { Edit2 } from "lucide-react";
 import { BookingData } from "@/types";
+import { parseLocalDate } from "@/lib/utils";
 
 interface SectionProps {
   title: string;
@@ -37,7 +38,7 @@ const Section = ({ title, content, step, onEdit }: SectionProps) => (
 
 export default function StepSummary({ data, onEdit, onConfirm, isSubmitting = false }: StepSummaryProps) {
   const dateFormatted = data.selectedDate
-    ? format(new Date(data.selectedDate), "EEEE, dd 'de' MMMM 'de' yyyy", { locale: ptBR })
+    ? format(parseLocalDate(data.selectedDate), "EEEE, dd 'de' MMMM 'de' yyyy", { locale: ptBR })
     : "";
 
   return (

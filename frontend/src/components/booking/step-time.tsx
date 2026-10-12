@@ -10,6 +10,8 @@ import { ApiError } from "@/lib/api";
 import { bookingService } from "@/services/booking.service";
 import type { BookingTimeSlot, StepComponentProps } from "@/types";
 
+import { parseLocalDate } from "@/lib/utils";
+
 export default function StepTime({ data, updateData, onNext }: StepComponentProps) {
   const [slots, setSlots] = useState<BookingTimeSlot[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -17,8 +19,8 @@ export default function StepTime({ data, updateData, onNext }: StepComponentProp
 
   const selectedDate = data.selectedDate?.slice(0, 10);
   const canLoadSlots = Boolean(selectedDate);
-  const dateFormatted = data.selectedDate
-    ? format(new Date(data.selectedDate), "dd 'de' MMMM", { locale: ptBR })
+  const dateFormatted = selectedDate
+    ? format(parseLocalDate(selectedDate), "dd 'de' MMMM", { locale: ptBR })
     : "Data não selecionada";
 
   const loadSlots = async () => {

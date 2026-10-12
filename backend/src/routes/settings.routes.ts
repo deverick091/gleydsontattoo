@@ -18,3 +18,4 @@ router.put('/studio-info', ...admin, controller.updateStudioInfo.bind(controller
 router.patch('/studio-info', ...admin, controller.updateStudioInfo.bind(controller));
 
 export default router;
+

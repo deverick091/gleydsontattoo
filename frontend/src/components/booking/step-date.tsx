@@ -82,7 +82,7 @@ export default function StepDate({ data, updateData, onNext }: StepComponentProp
             const isSpecificDateClosed = closedDates.includes(dateStr);
 
             const isDisabled = isPast || isDayClosed || isSpecificDateClosed;
-            const isSelected = data.selectedDate && isSameDay(new Date(data.selectedDate), day);
+            const isSelected = Boolean(data.selectedDate && data.selectedDate.slice(0, 10) === dateStr);
             const isToday = isSameDay(today, day);
 
             return (
